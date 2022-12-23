@@ -1,0 +1,32 @@
+# Importez le roman Maria Chapdelaine dont le chemin est le suivant: donnees/maria_chapdelaine.txt;
+library(stringr)
+maria <- readLines("donnees/maria_chapdelaine.txt")
+
+fixed(maria, pattern = "CHAP")
+
+maria_v <- strsplit(maria, "\\W") |> unlist()
+
+
+str_which(maria_v, "^$" )
+
+
+a <- str_which(maria_v, "")
+head(grep("", maria_v), 10)
+head(maria_v[a])
+# Repérez l'indice de l'élément du vecteur contenant le motif "CHAPITRE I" et assignez-le à une variable telle debut_roman (attention, l'expression régulière devra comporter une balise de mot pour éviter de confondre "CHAPITRE I" avec "CHAPITRE II" et "CHAPITRE III").
+# 
+# Utilisez le motif "bois pour les semailles" pour repérer l'élément du vecteur contenant l'excipit du roman; assignez cet indice à une variable telle fin_roman;
+# 
+# Assemblez en un seul élément tous ceux contenus dans le vecteur à l'aide de la fonction paste();
+#                                                                                                                           
+#                                                                                                                           Séparez tous les éléments lexicaux du roman en utilisant l'espace comme élément de division. Le résultat de cette opération sera une liste. Utilisez la fonction unlist() pour assembler les éléments séparés en un seul vecteur;
+# 
+# Observez les 100 premiers éléments de ce vecteur;
+# 
+# Repérez les indices de tous les éléments vides (pattern = "") et supprimez-les;
+# 
+# Construisez une table de fréquence avec la fonction table() et associez l'objet sortant à une nouvelle variable telle freq_maria_table;
+#                                                                                                                           
+#                                                                                                                           Triez cette table avec la fonction sort(), en prenant soin d'insérer l'argument decreasing=TRUE;
+#                                                                                                                           
+#                                                                                                                           Insérez cet objet dans la fonction data.frame() et observez, à l'aide de la fonction View(), les 100 premiers éléments des deux colonnes du tableau de données.

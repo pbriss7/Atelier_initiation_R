@@ -1,0 +1,161 @@
+---
+title: "Atelier 11: stringr"
+author: "Pascal Brissette (U. McGill)"
+date: 19 septembre 2022
+format: pdf
+editor: visual
+---
+
+L'extension `stringr` fait partie de la famille d'extensions `tidyverse`, qui répondent toutes à une philosophie de clarté et de cohérence, ainsi qu'à des règles d'enchaînement. On peut cependant utiliser l'extension stringr sans aucunement faire appel aux autres extensions de cette famille. On profite ainsi des avantages de `stringr` sans être prisonnier d'une façon de faire un peu rigide.
+
+`stringr` offre une multitude de fonctions dédiées spécifiquement à la manipulation des chaines de caractères. Ces fonctions sont parfois des quasi copies de fonctions de base de R. Cependant, on entre dans `stringr` comme dans une maison bien rangée: les fonctions ont des noms simples et cohérents, la syntaxe (ordre des arguments) est uniforme d'une fonction à l'autre, et l'utilisation des expressions régulières est clairement expliquée dans les vignettes et dans l'antisèche distribuée par la société RStudio:
+
+[![](images/antiseche_stringr.png){fig-align="center"}](https://www.rstudio.com/resources/cheatsheets/)
+
+Dans `stringr`, toute fonction débute par \`str\_\`, suivi d'un mot simple qui résume tâche qu'elle peut accomplir: `str_detect()`, `str_match()`, `str_extract()`, `str_subset()`, etc. On ne fera pas la revue complète de ces fonctions, on en donnera simplement un aperçu. Vous pourrez bien entendu approfondir votre connaissance et votre maîtrise des fonctions en consultant la vignette proposée dans l'aide de RStudio (`??stringr`).
+
+Pour illustrer l'utilité de stringr, nous allons importer le jeu de données sur les réalisatrices québécoises et leurs filmographies. Nous allons également installer, puis activer l'extension `stringr`.
+
+```{r}
+if(!"stringr" %in% rownames(installed.packages())) {install.packages("stringr")}
+library(stringr)
+
+filmog <- read.csv("donnees/filmographies_realisatrices_qc.tsv", sep = "\t", fileEncoding = "WINDOWS-1252")
+
+```
+
+### Fonctions d'indiçage
+
+On a déjà eu l'occasion d'utiliser la fonction de base `grep()` et `grepl()`, qui recourent à des expressions régulières et permettent de trouver des chaînes de caractères à l'aide de motifs. La première de ces fonctions renvoie le numéro des éléments d'un vecteur où le motif a croisé l'élément recherché, l'autre retourne un long vecteur logique indiquant, élément après élément, si oui (TRUE) ou non (FALSE) le motif a pu détecter la chaîne de caractères recherchée.
+
+Il est facile de confondre les deux fonctions de base en raison de leur similitude. Dans `stringr`, celles-ci ont des noms plus évocateurs. La fonction `str_detect()` est l'équivalent de grepl(): elle renverra un vecteur logique de même longueur que celui fourni en entrée, avec `TRUE` / `FALSE` comme valeurs. La fonction `str_which()` renverra pour sa part les numéros d'éléments où le motif a croisé la chaîne de caractères recherchée. Faisons-en l'essai avec la colonne des prénoms de réalisatrices. Recherchons-y les éléments qui commencent par "Nat". Assignons le résultat des fonctions à une variable et servons-nous en pour indicer le tableau.
+
+```{r}
+# Repérage du motif avec str_which()
+which_nat <- str_which(filmog$PRENOM_REALISATRICE, pattern = "^Na")
+
+# Repérage du motif avec str_detect()
+detect_nat <- str_detect(filmog$PRENOM_REALISATRICE, pattern = "^Na")
+
+# Indiçage du tableau avec le résultat des deux commandes.
+# On utilise l'argument drop = FALSE pour préserver le format data.frame en sortie
+head(filmog[which_nat, c("PRENOM_REALISATRICE"), drop = FALSE])
+head(filmog[detect_nat, c("PRENOM_REALISATRICE"), drop = FALSE])
+
+# On peut passer l'instruction ci-dessus à la fonction table() pour observer la distribution des prénoms
+table(filmog[detect_nat, c("PRENOM_REALISATRICE"), drop = FALSE])
+```
+
+Les fonctions introduites ci-dessus sont utiles pour indiquer si oui ou non une chaîne de caractères et présente ou non dans une série d'éléments d'un vecteur, mais elles ne diront pas combien de fois la chaîne de caractères a été trouvée dans chacun des éléments du vecteur. C'est ici que la fonction `str_count()` trouve son intérêt. Elle prendra un vecteur de caractères en entrée et renverra un vecteur numérique indiquant, pour chaque élément du vecteur entrant, combien de fois le motif a été associé. Voyons par exemple combien de fois les motifs "\[Ff\]emme" et "\[Hh\]omme" apparaissent dans les titres de films. On enchâssera la fonction `str_count()` dans la fonction `sum()`, pour obtenir, plutôt qu'une longue série de 0, de 1 et potentiellement de 2, le nombre total d'occurrences (*matchs*).
+
+```{r}
+sum(str_count(filmog$TITRE_ORIGINAL, "[Ff]emme"))
+sum(str_count(filmog$TITRE_ORIGINAL, "[Hh]omme"))
+
+
+```
+
+On pourrait ensuite faire un petit graphique avec des chiffres:
+
+```{r}
+x = c(sum(str_count(filmog$TITRE_ORIGINAL, "[Ff]emme")),
+      sum(str_count(filmog$TITRE_ORIGINAL, "[Hh]omme")))
+
+pie(x = x,
+    main = 'Occurrences des motifs "homme" et "femme" dans 1739 titres\nde films de réalisatrices québécoises',
+    labels = x,
+    col = rainbow(length(x)))
+legend("topright", c("Femme", "Homme"), cex = 0.8,
+       fill = rainbow(length(x)))
+```
+
+### Fonctions de substitution
+
+Les tâches de remplacements sont parmi les plus fréquentes que vous devrez accomplir dans votre carrière de manipulateur.trice de chaînes de caractères. Vous supprimerez des mots fonctionnels, vous mettrez en minuscules des textes complets, uniformiserez des séries de mots, et ainsi de suite. Dans votre arsenal de fouille, il vous faudra donc une fonction puissante et aisée à utiliser. Dans R de base, cette fonction s'appelle gsub(), mais on lui préférera ici `str_replace()` et `str_replace_all()`, de l'extension `stringr`. La première de ces deux fonctions ne remplacera que le premier cas (*match*) de chaque élément d'un vecteur trouvé à l'aide d'une expression régulière. La deuxième remplacera tous les cas repérés, même s'il y en a plus d'un dans un élément du vecteur. En guise d'exercice, nous allons créer une nouvelle colonne appelée ABBREV_NOM, dont les modalités seront faites de l'assemblage du prénom et du nom de chacune des réalisatrices du tableau. Ensuite, nous allons transformer chacun de ces noms complets en abréviations. L'expression régulière utilisée indique à la fonction que doivent être remplacées par un simple point tout caractère à l'exception (`[^]`) de lettres majuscules et de tirets.
+
+```{r}
+filmog$ABBREV <- paste(filmog$PRENOM_REALISATRICE,filmog$NOM_REALISATRICE, sep = "|")
+
+filmog$ABBREV <- str_replace_all(filmog$ABBREV, "[^A-ZÉÏ-]+", "\\.")
+
+# View(filmog)
+```
+
+D'autres fonctions de substitution très pratiques (`str_to_lower()`, `str_to_upper()`, `str_to_title()`) n'ont pas à être expliquées ici. Elles sont faciles à comprendre et à utiliser, et vous pourrez rapidement les mettre en pratique dans vos projets.
+
+### Fonctions d'extraction
+
+Les fonctions d'indiçage vues au début de l'atelier ne permettent pas d'extraire les chaînes de caractères correspondant aux expressions régulières. Elles peuvent certes être utilisées pour *indicer* les éléments de vecteurs, mais elles ne vous offriront pas toute la souplesse dont on a parfois besoin lorsqu'on travaille dans le détail des chaînes de caractères. Les fonctions du dernier groupe vu dans cet atelier, les fonctions d'extraction, vous offre cette dextérité.
+
+La première est très simple d'utilisation. Elle prend un vecteur en entrée et permettra d'extraire une chaîne comprise entre deux indices. Ceux-ci correspondent à la position qu'occupent les caractères dans la chaîne. Prenons les dix premiers prénoms uniques du vecteur filmog\$PRENOM_REALISATRICE pour illustrer le tout.
+
+```{r}
+# Ne vous laissez pas intimider par les fonctions enchâssées dans l'instruction ci-dessous.
+quelques_prenoms <- data.frame(prenoms = head(unique(filmog$PRENOM_REALISATRICE), 10))
+
+str_sub(quelques_prenoms$prenoms, start = 1, end = 3)
+```
+
+Chacun de nos 10 prénoms constitue un élément du vecteur `quelques_prenoms$prenoms`. Avec le premier argument, `start =`, on indique à la fonction qu'on veut extraire la chaîne de caractères à partir du premier caractère. Avec le deuxième argument, `end =`, on lui indique où arrêter l'extraction. On peut également, en utilisant un nombre négatif pour le second argument, indicer le caractère final de la chaîne *à partir de la fin*.
+
+```{r}
+# Ne vous laissez pas intimider par les fonctions enchâssées dans l'instruction ci-dessous.
+quelques_prenoms <- data.frame(prenoms = head(unique(filmog$PRENOM_REALISATRICE), 10))
+
+str_sub(quelques_prenoms$prenoms, start = 1, end = -2)
+```
+
+```{r}
+str_subset(filmog$PRENOM_REALISATRICE, "htt")
+```
+
+Les fonctions str_extract() et str_extract_all() permettent l'extraction de la chaîne de caractères représentée par l'expression régulière fournie à l'argument `pattern =`. Cette fonction n'est pas d'un grand intérêt si le motif inséré en guise d'expression régulière est simplement composé de lettres. Par exemple:
+
+```{r}
+str_extract_all(filmog$TITRE_ORIGINAL[c(446, 489, 626)], "femme")
+```
+
+Mais avec des expressions régulières plus complexes, elles peuvent s'avérer de puissantes alliées. On voudrait savoir par exemple quels mots précèdent et suivent immédiatement le mot femme dans les titres:
+
+```{r}
+# Ici encore, ne vous laissez pas intimider par l'expression régulière!
+
+unlist(str_extract_all(filmog$TITRE_ORIGINAL, pattern = "([\\w-']+?\\s?)?\\b[Ff]emmes?(\\s?\\b[\\w-']+)?"))
+```
+
+### Fonctions de séparation
+
+Parmi les fonctions que vous utiliserez fréquemment dans le cadre de l'analyse des données textuelles se trouve `strsplit()` ou sa version de l'extension `stringr`, `str_split()`. Celle-ci prend en entrée un vecteur et retournera une liste où chaque élément sera formé d'un vecteur comprenant les pièces qui ont été divisées par le motif indiqué dans la fonction. Prenons les six premiers éléments du vecteur `filmog$TITRE_ORIGINAL`, et séparons les mots qui le composent en prenant l'espace, l'apostrophe et le tiret comme motif de séparation.
+
+```{r}
+str_split(filmog$TITRE_ORIGINAL[1:6], pattern = "[\\s'’-]")
+
+```
+
+Les éléments qui ont servi à séparer les mots ont disparu et chaque titre a été divisé en ses différents lexèmes. On saisira l'intérêt d'une telle opération lorsqu'on fera des calculs statistiques à partir de vecteurs de caractères conséquents.
+
+## Défi
+
+1.  Importez le roman Maria Chapdelaine dont le chemin est le suivant: `donnees/maria_chapdelaine.txt`;
+
+2.  Repérez l'indice de l'élément du vecteur contenant le motif "CHAPITRE I" et assignez-le à une variable telle `debut_roman` (attention, l'expression régulière devra comporter une balise de mot pour éviter de confondre "CHAPITRE I" avec "CHAPITRE II" et "CHAPITRE III").
+
+3.  Utilisez le motif "bois pour les semailles" pour repérer l'élément du vecteur contenant l'excipit du roman; assignez cet indice à une variable telle `fin_roman`;
+
+4.  Assemblez en un seul élément tous ceux contenus dans le vecteur à l'aide de la fonction `paste()`;
+
+5.  Séparez tous les éléments lexicaux du roman en utilisant l'espace comme élément de division. Le résultat de cette opération sera une liste. Utilisez la fonction `unlist()` pour assembler les éléments séparés en un seul vecteur;
+
+6.  Observez les 100 premiers éléments de ce vecteur;
+
+7.  Repérez les indices de tous les éléments vides (`pattern = "^$"`) et supprimez-les;
+
+8.  Construisez une table de fréquence avec la fonction `table()` et associez l'objet sortant à une nouvelle variable telle `freq_maria_table`;
+
+9.  Triez cette table avec la fonction `sort()`, en prenant soin d'insérer l'argument `decreasing=TRUE`;
+
+10. Insérez cet objet dans la fonction data.frame() et observez, à l'aide de la fonction `View()`, les 100 premiers éléments des deux colonnes du tableau de données.
+
+## Pour aller plus loin
+
+Vignette, [`stringr`](https://stringr.tidyverse.org/)

@@ -1,0 +1,25 @@
+# Assignez à cinq objets différents une citation aléatoire de Proust composée chacune d'une seule phrase;
+
+c1 <- proust_random(1)
+c2 <- proust_random(1)
+c3 <- proust_random(1)
+c4 <- proust_random(1)
+c5 <- proust_random(1)
+
+
+# Créez un objet de longueur 5 avec ces cinq vecteurs atomiques;
+
+ctotal <- c(c1,c2,c3,c4,c5)
+
+# Amalgamez (collez) le premier et le dernier élément de ce vecteur, en les séparant avec une série d'astérisques *******.
+
+paste(c1,c5,sep = "*******")
+
+# Faites une copie du vecteur letters`.
+
+copie <- letters
+
+# Utilisez l'indiçage et la fonction paste() pour former le mot "abc".
+
+paste(letters[1],letters[2], letters[3], sep = "")
+paste0(letters[1],letters[2], letters[3])

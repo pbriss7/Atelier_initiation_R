@@ -1,0 +1,78 @@
+---
+title: "Atelier 13: enchaînement des opérations"
+author: "Pascal Brissette (U. McGill)"
+format: pdf
+editor: visual
+---
+
+[![Crédit photographique: Alexander Jauk, Pixaday](images/pipeline-g21036ba54_1280.jpg){fig-align="center"}](Image par <a href="https://pixabay.com/fr/users/alex_jauk-16800354/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=5351017">Alexander Jauk</a> de <a href="https://pixabay.com/fr//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=5351017">Pixabay</a>)
+
+## L'enchainement des opérations grâce à `magrittr`
+
+En 2014, Stefan Milton Bache et Hadley Wickham ont créé une extension, magrittr (en référence au tableau "Ceci n'est pas une pipe" de Magritte), destinée à accélérer l'écriture de codes et à en faciliter la lecture. Dans R natif, lorsqu'on souhaite combiner des instructions, on procède par enchâssement, comme ceci:
+
+```{r}
+# Simple importation d'un tableau de données que vous connaissez déjà
+longMetrages <- read.csv("donnees/rc_longs_metrages.csv")
+
+# Enchâssement de fonctions
+data.frame(prenoms = head(unique(longMetrages$GENRE)))
+```
+
+L'instruction ci-dessus:
+
+1.  Donne comme argument à la fonction `unique()` le vecteur `GENRE` du tableau `longMetrages`;
+2.  Ce qui est renvoyé par `unique()` est passé à la fonction `head()`, qui retient par défaut les 6 premières valeurs;
+3.  Ce qui est renvoyé par `head()` est passé à la fonction `data.frame()`.
+
+La lecture de l'instruction, de l'intérieur vers l'extérieur, n'est pas des plus naturelles pour un utilisateur occidental, habitué de lire de gauche à droite. L'extension `magrittr` introduit un opérateur, appelé pipe `%>%`, qui permet l'enchaînement des fonctions dans le sens de la lecture (de gauche à droite). L'extrant de la première fonction est soumis comme intrant la deuxième fonction, et ainsi de suite. Les instructions du dernier bloc pourraient ainsi se présenter ainsi (on installe et active d'abord l'extension `magrittr`):
+
+```{r}
+if(!"magrittr" %in% rownames(installed.packages())) {install.packages("magrittr")}
+library(magrittr)
+longMetrages$GENRE %>% unique() %>% head() %>% data.frame()
+```
+
+## L'enchainement des opérations dans R natif
+
+Jusqu'à récemment, l'usage du pipe était propre à `magrittr` et aux extensions construites sur ses fondements, notamment la famille d'extensions `tidyverse`. Dans la [version 4.1.0 de R](https://www.r-bloggers.com/2021/05/the-new-r-pipe/), parue en 2021, les développeurs ont introduit un équivalent du pipe `%>%`, soit `|>`. Il n'est donc plus nécessaire d'installer et d'activer `magrittr` pour pouvoir écrire vos instructions selon la philosophie introduite par cette extension. Ainsi, l'opération faite ci-dessus peut être menée avec le nouveau pipe:
+
+```{r}
+longMetrages$GENRE |> unique() |> head() |> data.frame()
+```
+
+## L'enchaînement des opérations dans `data.table`
+
+Les tables de données créées avec data.table, on s'en rappelle, sont aussi des tableaux de données de type data.frame. Aussi, toute table de type data.table peut être utilisée avec les pipes provenant de magrittr ou de R 4.1.0+. Dans l'instruction ci-dessous, nous allons créer une nouvelle variable VERDICT fondée sur les modalités de COTE_MEDIAFILM, puis nous allons filtrer la table pour qu'elle ne retienne que les observations correspondant à la modalité "bon" que nous avons introduite.
+
+```{r}
+if(!"data.table" %in% rownames(installed.packages())) {install.packages("data.table")}
+library(data.table)
+
+setDT(longMetrages)
+class(longMetrages)
+
+longMetrages[, VERDICT := ifelse(COTE_MEDIAFILM > 3, "bon", "mauvais")] %>% .[VERDICT == "bon"]
+```
+
+On peut cependant faire les choses de manière plus élégante en recourant aux outils que fournit d'emblée `data.table`. Le pipe n'est tout simplement pas nécessaire, non plus que l'opérateur `.`, qui représente l'extrant de l'opération antérieure. On peut se contenter d'utiliser les opérateurs d'indexation `[ ]`:
+
+```{r}
+
+longMetrages[, VERDICT := ifelse(COTE_MEDIAFILM > 3, "bon", "mauvais")
+             ][VERDICT == "bon"]
+
+```
+
+Dans l'opération ci-dessus, aucune copie profonde de l'objet n'a été faite. La colonne VERDICT a été faite par [sémantique référentielle](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reference-semantics.html) et l'extrant de cette opération a été fourni en intrant pour l'opération de filtrage sans créer de nouvelle copie de l'objet.
+
+Ce type de syntaxe est donc non seulement plus aisée à suivre et à lire, mais elle offre des gains computationnels importants.
+
+## Défi
+
+1.  Importez le fichier "donnees/actes_criminels.csv" avec la fonction d'importation par défaut de l'extension data.table;
+2.  Enchainez les opérations suivantes:
+    1.  Ne retenez des observations qui se situent entre le 1er janvier 2018 et le 31 décembre 2018;
+
+    2.  Regroupez les données par `CATEGORIE`.
+3.  Combien d'infractions entrainant la mort ont-elles été commises en 2018?

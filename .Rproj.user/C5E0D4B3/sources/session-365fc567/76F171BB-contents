@@ -1,0 +1,27 @@
+# Défi no 3
+
+# Donnez un nom à chaque ligne et à chaque colonne de l'objet matrice_numerique;
+rownames(matrice_numerique) <- paste("ligne", 1:nrow(matrice_numerique), sep = "_")
+colnames(matrice_numerique) <- paste("colonne", 1:ncol(matrice_numerique), sep = "_")
+
+# Calculez la somme de chaque ligne de cette matrice avec la fonction rowSums() et assignez le vecteur résultant de ce calcul à une variable;
+col_sum <- rowSums(matrice_numerique)
+
+# Ajoutez ce vecteur à la matrice existante
+matrice_numerique <- cbind(matrice_numerique, col_sum)
+
+
+
+# Défi no 3
+# Ajoutez au tableau original une nouvelle colonne appelée annee.naissance et insérer
+# les données appropriées.
+ouvrages$annee.naissance <- c(1740, 1766, 1802, 1804, 1840, 1860, 1810, 1790)
+
+# 2. Déplacez cette nouvelle colonne entre les colonnes auteur.trice et est.femme.
+ouvrages <- ouvrages[ , c("auteur.trice", "annee.naissance", "est.femme", "oeuvre", "annee.publication", "genre.litteraire")]
+
+# 3. Ajoutez une ligne au tableau avec un.e auteur.trice.trice de votre choix.
+ouvrages[nrow(ouvrages)+1, ] <- list("Olympe de Gouges", 1748L, TRUE, "Déclaration des droits de la femme et de la citoyenne", 1791L,"essai/texte législatif")
+
+# 4. Organisez le tableau en fonction des modalités de la variable est.femme (utilisez la fonction order() pour cela).
+ouvrages[order(ouvrages$est.femme, decreasing = TRUE), ]

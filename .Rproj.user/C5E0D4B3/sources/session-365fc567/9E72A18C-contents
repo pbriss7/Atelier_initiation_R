@@ -1,0 +1,89 @@
+---
+title: "Atelier 14: les fonctions"
+author: "Pascal Brissette (U. McGill)"
+format: pdf
+editor: visual
+---
+
+[![Image vectorielle libre de droits, Pixabay](images/gear-wheel-g4c97afd80_1280.png){fig-align="center"}](https://pixabay.com/fr/vectors/roue-dent%c3%a9e-%c3%a9quipement-rouages-dent-310906/)
+
+On a dit déjà que les fonctions étaient dans R des objets qui, comme d'autres, peuvent être créés, modifiés et utilisés au besoin. Les fonctions que vous avez utilisées jusqu'ici proviennent d'extensions, mais rien ne vous empêche de créer vos propres fonctions, destinées à remplir des tâches spécifiques. Vous y êtes même fortement encouragé·e·s.
+
+Pourquoi?
+
+Tout d'abord, une fonction est réutilisable et peut donc être mobilisée n'importe quand, dans n'importe quel script, pour effectuer une tâche donnée. Il y a donc un gain de temps: vous n'avez pas à vous répéter.
+
+Ensuite, si vous devez constamment copier des lignes de codes ici et là comme autant de pièces d'un puzzle, assembler ces pièces en une fonction permettra d'éviter les erreurs, les oublis, les pertes. Ajoutons qu'une fonction rend votre code plus facile à lire et, au besoin, à corriger. La fonction se présente comme un bloc d'instructions qu'on peut ouvrir pour en modifier les composantes, mais qui, enchâssé dans un objet de l'environnement, ne prend plus de place dans vos scripts.
+
+Commençons par un exemple. On pourrait écrire une fonction de "mise en route" de RStudio qui permette, une fois exécutée, d'activer nos extensions préférées et de déterminer le chemin vers le répertoire des données où se trouvent nos fichiers à traiter. Traitons une à la fois ces différentes tâches. On utilisera la fonction `function()` pour créer chacune des fonctions qui, ultérieurement, pourront être rassemblées en une seule fonction maîtresse.
+
+```{r}
+# Première fonction: insalle si elle ne l'est déjà, puis active une extension
+activer_extension <- function(x) {
+  invisible(if(!x %in% rownames(installed.packages())) {install.packages(x)})
+  invisible(library(x, character.only=TRUE))
+}
+
+# Essayez!
+# activer_extension("data.table")
+
+```
+
+L'intérêt déjà de cette première fonction est que, malgré le fait qu'elle ne prenne qu'un argument (`extension=`), vous pouvez l'insérer dans une boucle `for()` ou, encore plus rapide, à une fonction `sapply()`. Vous créez d'abord un vecteur comprenant toutes les extensions dont vous aurez besoin, et vous passez ce vecteur à `sapply()`:
+
+```{r}
+mes_extensions <- c("data.table", "proustr", "stringr", "rbenchmark", "lsa")
+
+# sapply(X = mes_extensions, FUN = activer_extension)
+
+# for(i in seq_along(mes_extensions)){
+#   activer_extension(mes_extensions[i])
+#   }
+
+```
+
+Cette fonction est déjà pratique, mais le mieux serait que nous n'ayons pas à systématiquement assigner un vecteur à une variable, puis à passer cette variable à `sapply()`. D'un autre côté, comment savoir à l'avance le nombre d'extensions que je souhaiterai chaque fois passer à la fonction à l'intérieur de `sapply()`? Allons-y une étape à la fois. Utilisons d'abord la fonctin `readline()` du dans l'atelier sur les structures de contrôle pour demander quelles extensions sont à activer. La réponse sera emmagasinée dans un vecteur dont on pourra séparer les éléments avec la fonction de base `strsplit()`. Celle-ci renvoyant une liste, on utilisera la fonction unlist() pour assembler les éléments dans un nouveau vecteur.
+
+```{r}
+# La question sera posée dans la console et la réponse sera emmagasinée dans noms_extension
+# noms_extensions <- readline(prompt = "Quelles extensions activer? Sépare chaque nom d'extension par une virgule ")
+
+# On voudra séparer les éléments pour les passer, un à un, à la fonction activer_extension()
+# noms_extensions_v <- strsplit(noms_extensions, ",") |> unlist()
+
+```
+
+Nos noms d'extension sont maintenant prêts à être passés à la fonction `activer_extension()`, elle-même insérée dans `sapply()`. On enveloppe le tout de la fonction `invisible()` qui permet d'éviter les messages renvoyés par les opérations.
+
+```{r}
+# invisible(sapply(noms_extensions_v, activer_extension))
+```
+
+On veut maintenant que ces différents éléments soient intégrés à une fonction plus générale.
+
+```{activer_extensions <- function() {}
+noms_extensions <- readline(prompt = "Quelles extensions activer? Sépare chaque nom d'extension par une virgule (ex.: data.table,dplyr,ggplot2) ")
+noms_extensions_v <- strsplit(noms_extensions, ",") |> unlist()
+invisible(sapply(noms_extensions_v, activer_extension))
+}
+```
+
+```{r}
+activer_extensions <- function() {
+  noms_extensions <- readline(prompt = "Quelles extensions activer? Sépare chaque nom d'extension par une virgule (ex.: data.table,dplyr,ggplot2) ")
+  noms_extensions_v <- strsplit(noms_extensions, ",") |> unlist()
+  invisible(sapply(noms_extensions_v, activer_extension))
+}
+```
+
+On n'a plus qu'à exécuter cette dernière fonction pour que R nous demande, dans la console, quelles fonctions sont à installer et à activer.
+
+```{r}
+activer_extensions()
+```
+
+Si vous estimez cette fonction utile, vous pouvez la copier dans un simple fichier .R (exemple: mes_fonctions.R), que vous placerez dans l'environnement de travail. Chaque fois que vous ouvrirez le projet, vous pourrez importer les fonctions inscrites dans ce fichier à l'aide de `source()`.
+
+## Pour aller plus loin
+
+Data Carpentry, "[Creating functions](https://swcarpentry.github.io/r-novice-inflammation/02-func-R/)"

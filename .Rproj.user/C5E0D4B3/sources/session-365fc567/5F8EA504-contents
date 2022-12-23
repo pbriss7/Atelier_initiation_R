@@ -1,0 +1,287 @@
+---
+title: "Atelier 9: structures de contrôle"
+author: "Pascal Brissette (U. McGill)"
+format: pdf
+editor: visual
+---
+
+Dans l'Atelier 5, vous avez croisé cette instruction:
+
+```{r}
+# Atelier 5
+if(!"ouvrages" %in% ls()) {ouvrages <- readRDS("donnees/ouvrages.RDS")}
+
+```
+
+Dans l'Atelier 7, vous avez à nouveau pu voir une instruction ayant la même structure:
+
+```{r}
+if(!"rvest" %in% rownames(installed.packages())) {install.packages("rvest")}
+```
+
+On retrouve ce type d'instructions dans de nombreux langages de programmation. Elles sont très importantes et très puissantes, mais à quoi servent-elles?
+
+Les instructions commençant par `if()`, `for()` et `while()` constituent des "structures de contrôle. On appelle ainsi des instructions qui indiquent à l'interpréteur à **quelle(s) condition(s)** **il doit exécuter** une ou une série d'instructions, ou encore **à quelle(s) condition(s) il doit arrêter un processus itératif**. Les structures de contrôle se divisent en deux ensembles. Le premier est formé des structures conditionnelles, le second, des structures itératives.
+
+Dans cet atelier, nous allons examiner ces deux types d'instructions et utiliser des exemples concrets pour vous aider à les maîtriser.
+
+## Les structures conditionnelles
+
+Tout d'abord, nous allons décomposer l'instruction du premier bloc et nous assurer de comprendre ses composantes.
+
+Tout au coeur de l'instruction se trouve la fonction `ls()`. Exécutez cette fonction et voyez son résultat
+
+```{r}
+ls()
+```
+
+La fonction `ls()` retourne simplement la liste des objets qui se trouvent dans votre environnement de travail, ceux qui sont affichés dans le paneau supérieur droit de RStudio.
+
+La structure conditionnelle `if()` dit à l'interpéteur que si l'élément "ouvrages" ne fait pas partie de la série des objets contenus dans l'environnement de travail, il doit l'importer.
+
+Voici le détail:
+
+| Partie de l'instruction                       | Traduction approximative et explication                                                                                       |
+|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| `if(…)`                                       | "si est vrai ce qui se trouve dans la parenthèse..."                                                                          |
+| `!`                                           | "...\[que\] n'est pas..." (opérateur de négation)                                                                             |
+| `"ouvrages"`                                  | "...ouvrages..." (élément)                                                                                                    |
+| `%in%`                                        | "...dans le vecteur..." (opérateur d'inclusion)                                                                               |
+| `ls()`                                        | "...objets de l'environnement..." (vecteur)                                                                                   |
+| `{...}`                                       | "...alors exécute l'instruction..." (les accolades enserrent l'instruction à exécuter si la condition précédente est remplie) |
+| `ouvrages <- readRDS("donnees/ouvrages.RDS")` | "...importation et assignation d'un objet à la variable `ouvrages`." (instruction)                                            |
+
+Avant d'exécuter une structure de contrôle, vous pouvez tester ses composantes:
+
+```{r}
+
+# Est-ce que l'objet "ouvrages" est dans l'environnement de travail? La réponse sera TRUE ou FALSE
+"ouvrages" %in% ls()
+
+
+!"ouvrages" %in% ls() # Avec l'opérateur de négation
+
+
+```
+
+Comme l'instruction ci-dessus est insérée dans une structure conditionnelle `if()`, l'interpéteur s'attend à ce que vous fournissiez entre les accolades une instruction à suivre si le résultat du test est TRUE.
+
+### Structure If()...else()
+
+Dans l'exemple ci-dessus, la structure indique ce qu'il faut faire si la condition indiquée dans la parenthèse de `if()` est `TRUE`, mais qu'arrivera-t-il si le résultat du test est `FALSE`?
+
+La réponse? Rien. La condition n'étant pas remplie et aucune autre option n'étant offerte, l'interpéteur ne fera rien.
+
+Il pourrait cependant se trouver que vous souhaitiez indiquer à R qu'en cas de résultat négatif, il doit également faire quelque chose.
+
+Construisons un tableau de données comprenant des noms d'auteures, des titres, des dates de publication et les genres littéraires associés.
+
+```{r}
+auteures_quebecoises <- data.frame(nom = c("Anne Hébert",
+                                           "Nicole Brossard",
+                                           "Joséphine Bacon",
+                                           "Martine Delvaux"),
+                                   oeuvre = c("Le tombeau des rois",
+                                              "Le désert mauve",
+                                              "Un thé dans la toundra",
+                                              "Les filles en série"),
+                                   annee = c(1953L, 1993L, 2013L, 2016L),
+                                   genre = c("poésie", "roman", "poésie", "essai"))
+auteures_quebecoises
+```
+
+On pourrait demander à R d'imprimer une phrase si, dans ce tableau, on trouve une certaine valeur.
+
+```{r}
+if(1953L %in% auteures_quebecoises$annee) {print("Oui, le tableau comporte bien une oeuvre publiée en 1953.")} # VRAI
+
+if("Kamouraska" %in% auteures_quebecoises$oeuvre) {print("Oui, Kamouraska fait bien partie des oeuvres du tableau.")} # FAUX
+
+```
+
+Les choses se déroulent bien comme nous l'avions prévu: la condition du premier test étant rempli (`TRUE`), R exécute l'instruction contenue dans les accolades qui suivent. Le résultat du test de la deuxième instruction étant `FALSE`, R ne fait rien.
+
+Il serait bien entendu préférable de pouvoir ajouter une clause à notre test et dire à R ce qu'il doit faire si la réponse est `FALSE`. C'est ici que l'option `else()` devient intéressante: elle indique à l'interpréteur ce qu'il doit faire si la condition du `if()` n'est pas remplie, autrement dit si la valeur renvoyée par le test est `FALSE`.
+
+```{r}
+if("Kamouraska" %in% auteures_quebecoises$oeuvre) {
+  print("Oui, Kamouraska fait bien partie des oeuvres du tableau.")
+  } else {
+    print("Non, Kamouraska ne fait pas partie des oeuvres du tableau.")
+    }
+```
+
+### Structures conditionnelles imbriquées
+
+Vous vous retrouverez souvent dans des situations où vous souhaiterez l'exécution d'instructions seulement si plusieurs conditions sont remplies ou ne le sont pas. Vous pourrez alors imbriquer des structures conditionnelles. La forme générale de cette structure est la suivante:
+
+```{r}
+# if( <test_1> ) {
+
+#   <instructions> # exécutées si le résultat du test est TRUE
+
+#     } else if( <test_2> ) {
+
+#     <instructions> # exécutées si résultat de test_1 est FALSE et résultat de test_2 est TRUE
+
+#         } else {
+
+#           <instructions> #exécutées si résultats de test_1 et test_2 sont FALSE
+
+#             }
+
+```
+
+Nous allons tirer partie de cette structure imbriquée pour ajouter une auteure à notre tableau. Nous allons d'abord demander à R si le livre *Folle* de Nelly Arcan se trouve dans le tableau (vecteur `auteures_quebecoises$oeuvre`). S'il s'y trouve, il devra renvoyer la phrase "Oui, l'ouvrage *Folle* de Nelly Arcan fait partie du tableau". S'il ne s'y est pas, il passera au deuxième test, qui consiste à vérifier si l'auteure Nelly Arcan est l'une des auteures du tableau (vecteur `auteures_quebecoises$nom`). Si le test est positif, R devra renvoyer la phrase "Le titre *Folle* ne fait pas partie du tableau, mais l'auteure s'y trouve avec un autre titre". Si le test est négatif, il devra ajouter le titre *Folle* et les éléments apparentés dans le tableau.
+
+```{r}
+if("Folle" %in% auteures_quebecoises$oeuvre) {
+  print("Oui, l'ouvrage Folle de Nelly Arcan fait partie du tableau")
+} else if("Nelly Arcan" %in% auteures_quebecoises$nom) {
+  print("Le titre Folle ne fait pas partie du tableau, mais l'auteure s'y trouve avec un autre titre") } else {
+    auteures_quebecoises <- rbind(auteures_quebecoises, list("Nelly Arcan", "Folle", 2004L, "roman"))
+    print("Le titre Folle et l'auteure Nelly Arcan ne faisaient pas partie du tableau. Nous avons fait cet ajout")
+  }
+```
+
+Si vous exécutez les instructions ci-dessus une première fois, vous recevrez le message indiquant que le titre et l'auteure ne faisaient pas partie du tableau, et qu'ils y ont été ajoutés. Si vous exécutez à nouveau le bloc d'instructions, comme le titre s'y trouve maintenant, vous recevrez un autre message. Essayez!
+
+Utilisons un autre exemple de la même structure conditionnelle, et profitons-en pour ajouter des auteures à notre tableau.
+
+Nous allons demander à R de vérifier si, dans notre tableau, se trouvent des oeuvres publiées avant 1950. Dans le cas contraire, il devra ajouter trois lignes au tableau. Avant de faire cette opération, nous allons ordonner le tableau de manière chronologique, en utilisant le vecteur `auteures_quebecoises$annee` comme point d'entrée:
+
+```{r}
+# Ordonner le tableau en fonction de la date de publication des oeuvres
+auteures_quebecoises <- auteures_quebecoises[order(auteures_quebecoises$annee),]
+
+# Comme condition, demandons maintenant à R si le premier élément du vecteur annee est égal ou supérieur à 1950. Si le résultat est TRUE, cela veut dire qu'aucune oeuvre antérieure à 1950 ne figure dans le tableau. Il devra alors ajouter trois entrées.
+if(auteures_quebecoises$annee[1] >= 1950) {
+  auteures_quebecoises <- rbind(auteures_quebecoises, 
+                                list("Elisabeth Bégon", "Lettres au cher fils", 1748L, "lettres"),
+                                list("Blanche Lamontagne-Beauregard", "Visions gaspésiennes", 1913L, "poésie"),
+                                list("Laure Conan", "Angéline de Monbrun", 1882L, "roman"))
+  print("Trois auteures, dont les oeuvres ont été publiées avant 1950, ont été ajoutées au tableau.")
+} else {
+  print("Le tableau comporte déjà au moins une oeuvres antérieures à 1950.")
+}
+```
+
+## Les boucles
+
+Le test que nous avons fait ci-dessus consistait à vérifier si le premier élément de la colonne-vecteur `auteures_quebecoises$annee`, préalablement ordonnée du plus petit au plus grand nombre entier, répondait à une condition spécifique. Le test ne portait que sur cet élément en particulier. Il arrive cependant des cas où nous souhaitons que chaque élément de chaque ligne fasse l'objet d'un test. Prenons un exemple pour illustrer ce type de situation.
+
+Supposons que nous demandions à R d'ajouter à notre tableau une colonne "periode" fondée sur la valeur indiquée dans une autre colonne, celle des années de publication. Une simple instruction `if()` pourra-t-elle nous être utile? La réponse est non, car l'interpréteur n'évaluera que la première valeur rencontrée, soit celle indiquée dans `auteures_quebecoises$annee[1]`. Il insérera alors dans la nouvelle colonne `auteures_quebecoises$periode` la même valeur pour chacune des lignes. Ce n'est pas ce que nous voulons. Nous voudrions qu'il passe le test à chacune des valeurs du vecteur-colonne `auteures_quebecoises$annee` et qu'il transpose le résultat de ces tests faits indépendamment les uns des autres, dans la colonne-vecteur `auteures_quebecoises$annee`.
+
+Pour faire une telle chose, nous devrons recourir à une boucle, plus exactement à une boucle `for()`. Observez la construction des lignes d'instructions dans le bloc ci-dessous:
+
+```{r}
+for(i in 1:nrow(auteures_quebecoises)) {
+  if(auteures_quebecoises$annee[i] > 1999) {
+    auteures_quebecoises$periode[i] <- "XXIe siècle"
+    } else if(auteures_quebecoises$annee[i] %in% 1899:2000) {
+      auteures_quebecoises$periode[i] <- "XXe siècle"
+      } else if(auteures_quebecoises$annee[i] %in% 1799:1900) {
+        auteures_quebecoises$periode[i] <- "XIXe siècle"
+        } else {
+          auteures_quebecoises$periode[i] <- "XVIIIe siècle"
+        }
+  }
+```
+
+### La boucle `for()`
+
+La boucle `for()` permet de répéter un nombre de fois déterminé une séquence d'instructions sur un objet récursif.
+
+La structure de la boucle se présente comme suit:
+
+`for( <chaque élément de ... à ...> ) { <instructions(s)> }`
+
+Dans le bloc d'instructions ci-dessus on a demandé à l'interpréteur de répéter la structure conditionnelle `if()…else()` contenue dans les accolades autant de fois qu'il y a de lignes dans le tableau `auteures_quebecoises`. On a utilisé la variable `i` pour désigner chacun des éléments de la boucle (par convention, `i` renvoyant à l'argument des lignes dans l'indiçage d'un tableau), mais on aurait pu utiliser n'importe quelle autre chaîne de caractères. Dans chaque itération de la boucle, `i` a pris un numéro de ligne, de 1 à `nrow(auteures_quebecoises)`, donc de 1 à 8. Ainsi, la première fois que l'interpréteur a passé à travers le bloc d'instructions, le `i` valait 1 et l'élément du tableau ainsi indicé a fait l'objet des tests de la structure `if()…else()`. Arrivé au bout des instructions, l'interpréteur a recommencé et a attribué la valeur 2 à la variable `i`, et ainsi de suite jusqu'à 8. Dans cette structure, on dit d'emblée à R, dans la parenthèse, combien de fois il doit itérer.
+
+### La boucle `while()`
+
+Les boucles `while()` ont la même structure que les boucles `for()`, mais au lieu d'exécuter une commande un nombre de fois déterminé d'emblée, elles les exécutent tant et aussi longtemps qu'une certaine condition n'est pas remplie. Cette caractéristique les rend à la fois plus souples et plus dangereuses. Plus souples, parce qu'on n'est pas forcé de leur fournir un nombre prédéterminé d'itérations. Plus dangereuses, parce que si cette condition, pour quelque raison que ce soit, n'est pas remplie, ces boucles se poursuivent indéfiniment et il faudra y mettre un terme en utilisant un levier externe (fermeture forcée du logiciel, etc.).
+
+Ce type de structure a un intérêt particulier dans un programme interactif où une réponse donnée à une question peut entrainer l'exécution automatique d'une commande. Supposons par exemple qu'on souhaite inviter les internautes à ajouter des notices à notre tableau des auteures québécoises. On pourrait demander à nos internautes imaginaires de répondre à une série de questions correspondant aux valeurs du tableau, emmagasiner ces valeurs dans des objets, les assembler dans une liste, puis joindre celle-ci à notre tableau. Les questions apparaitront dans la console lorsque vous exécuterez le code ci-dessous.
+
+#### Exemple 1
+
+```{r}
+# Préparez-vous à ajouter des notices à notre tableau!
+reponse <- tolower(readline(prompt = "Souhaites-tu ajouter une notice au tableau des auteures québécoises? (oui/non) "))
+if(reponse == tolower("oui")) {
+  while(!reponse == tolower("non")){     
+  auteure_temp <- readline(prompt = "Écris le nom d'une auteure: ")
+  oeuvre_temp <- readline(prompt = "Donne le titre de l'une de ses oeuvres: ")
+  annee_temp <- readline(prompt = "Indique l'année de publication de cette oeuvre:  ")
+  genre_temp <- readline(prompt = "Précise le genre de cette oeuvre:  ")
+  periode_temp <- readline(prompt = "Fournis la période de cette oeuvre (exemple: 'XXIe siècle'):  ")
+  une_notice <- list(auteure_temp, oeuvre_temp,annee_temp, genre_temp,
+                     periode_temp)   # les différentes réponses sont rassemblées dans une liste
+  auteures_quebecoises <- rbind(auteures_quebecoises, une_notice)
+  reponse <- tolower(readline(prompt = "Merci pour l'ajout de cette notice! Souhaites-tu en ajouter une autre? (oui/non) "))
+}
+} else {
+  print("Merci tout de même d'avoir bien voulu répondre à cette question!")
+}
+
+auteures_quebecoises <- auteures_quebecoises[order(auteures_quebecoises$annee),]
+auteures_quebecoises
+```
+
+Le bloc d'instructions ci-dessus contient trois principales parties.
+
+1\) Il y a tout d'abord une instruction tirant profit de la fonction `readline()` pour poser une question (dans la console), dont la réponse doit être "oui" ou "non". Si jamais l'internaute écrit "Non", avec une majuscule, plutôt que les trois caractères minuscules attendus, la fonction `tolower()` transformera la chaîne de caractères en lettres minuscules. La réponse à cette question est emmagasinée dans une variable, `reponse`.
+
+2\) La commande `if()` ouvre ensuite une alternative. La condition insérée dans la parenthèse de `if( )` est celle d'une équivalence entre l'objet `reponse` et les trois caractères "oui". Si cette condition est `TRUE`, alors R enchaînera avec les instructions insérées dans les accolades.
+
+Si la réponse à la question a été "non", R descendra immédiatement à `else{…}` et comprendra qu'il doit renvoyer la phrase "Merci...".
+
+Dans les instructions insérées dans les accolades, il y a une boucle `while()`. Celle-ci indique, dans la parenthèse, à quelle condition le processus itératif doit être arrêté. Cette condition peut se lire comme suit: "tant et aussi longtemps que la réponse à la question insérée à la fin des instructions n'est pas"non", continue de poser des questions et d'ajouter des lignes au tableau. Sitôt que la réponse à la question de la boucle sera "non", la boucle sera rompue et les itérations s'arrêteront.
+
+3\) À l'extérieur de la boucle, au bas du bloc d'instructions, on réordonnera le tableau selon la date de parution (vecteur-colonne `auteures_quebecoises$annee`).
+
+Question: pouvez-vous repérer les instructions qui ne seront exécutées qu'une seule fois dans le bloc ci-dessus?
+
+## Défi
+
+1.  Ajoutez une colonne au tableau de données `auteures_quebecoises` appelée `type`. Les modalités insérées dans cette colonne seront fondées sur celles de la colonne `genre`.
+
+-   Si la modalité au croisement de auteures_quebecoises\[`i`, "genre"\] est "lettres", "roman" ou "essai", alors celle qui doit être inscrite dans la colonne `type`, pour la même ligne, doit être "prose";
+
+-   Si la modalité au croisement de auteures_quebecoises\[`i`, "genre"\] est "poésie", alors celle qui doit être inscrite dans la colonne `type`, pour la même ligne, doit être "vers".
+
+2.  Dans l'Atelier 7 sur le grattage de sites internet, nous avons utilisé une boucle `while()` pour lire et importer chacun des 11 paragraphes de l'article ["Premier ministre du Québec"](https://fr.wikipedia.org/wiki/Premier_ministre_du_Qu%C3%A9bec) de la page Wikipédia. Nous reproduisons ci-dessous le bloc de code. Les instructions sont précédées d'un croisillon et d'un chiffre. Expliquez chacune de ces six instructions.
+
+    ```{r}
+    library(polite)
+    library(rvest)
+
+    #1
+    description <- vector(11, mode = "list")
+
+    #2
+    session <- bow("https://fr.wikipedia.org/wiki/Premier_ministre_du_Qu%C3%A9bec",
+                   user_agent = "Pascal Brissette, U. McGill, pascal.brissette@mcgill.ca")
+
+    #3
+    page_prem_min <- scrape(session)
+
+    #4
+    url <- "/html/body/div[1]/div/div[4]/main/div/div[2]/div[1]/p["
+
+    #5
+    i = 2
+
+    #6
+    while(i < 12) {
+      description[[i-1]] <- html_element(page_prem_min, xpath = paste0(url, i, "]")) |> html_text2()
+      i = i+1
+    }
+    ```
+
+## Pour aller plus loin
+
+Sophie Baillargeon, [Site du cours STT-4230](https://stt4230.rbind.io/programmation/struct_controle_r/), section sur les structures de contrôle.
+
+[Article de R-Bloggers](https://www.r-bloggers.com/) sur les structures de contrôle (utiliser l'outil de recherche pour trouver les articles d'intérêt.

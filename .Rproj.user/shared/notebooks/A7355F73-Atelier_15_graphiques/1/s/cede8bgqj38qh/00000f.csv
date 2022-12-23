@@ -1,0 +1,6 @@
+"0","p3 <- p2 +"
+"0","  ggtitle(""Prénoms des prétendants de Maria Chapdelaine (fréquence brute)"")+ "
+"0","  xlab(""Prénom"") +"
+"0","  ylab(""Fréquence brute"")"
+"0",""
+"0","p3"

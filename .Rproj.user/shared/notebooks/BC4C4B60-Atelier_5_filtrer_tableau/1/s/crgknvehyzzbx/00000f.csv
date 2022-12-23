@@ -1,0 +1,1 @@
+"0","rc[c(grep(pattern = ""femme"", x = rc$TITRE_FRANÇAIS), grep(pattern = ""Femme"", x = rc$TITRE_FRANÇAIS)) , c(""TITRE_ORIGINAL"", ""TITRE_FRANÇAIS"")]"

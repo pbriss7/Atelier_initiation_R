@@ -1,0 +1,2 @@
+"0",""
+"0","ouvrages[ouvrages$annee.publication > 1750 & ouvrages$annee.publication < 1830,]"

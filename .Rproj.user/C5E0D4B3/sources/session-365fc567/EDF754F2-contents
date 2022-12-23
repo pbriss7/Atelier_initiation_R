@@ -1,0 +1,18 @@
+---
+title: "Atelier 5: l'extension data.table"
+author: "Pascal Brissette (U. McGill"
+format: pdf
+editor: visual
+---
+
+La structure de données vue dans le dernier atelier, le `data.frame` ou talbeau de données, fait partie de l'arsenal élémentaire du langage R. Des programmeurs et utilisateurs avancés de R ont créé au fil du temps des versions améliorées de cette structure de données. Quand vous avez utilisé l'extension `proustr`, dans le premier atelier, vous avez déjà croisé l'un de ces `data.frame` amélioré, le `tibble`. Nous reviondrons ultérieurement sur le `tibble` et sur ses atouts. Dans le présent atelier, nous allons nous concentrer sur un type de `data.frame` particulièrement intéressant dans le cadre de la manipulation de données textuelles, la `data.table`. Pourquoi s'y intéresser? La `data.table`, qu'on traduira dans la suite par "table de données" pour la distinguer du `data.frame` ou tableau de données de base, permet de faire des opérations usuelles avec des gains importants du point de vue des ressources computationnelles. Sans entrer dans les détails,
+
+
+
+
+```{r}
+
+
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).

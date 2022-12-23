@@ -1,0 +1,10 @@
+---
+title: "Atelier 9: structures de contrôle"
+author: "Pascal Brissette (U. McGill)"
+format: pdf
+editor: visual
+---
+
+Dans l'Atelier 6, vous avez appris à importer dans l'environnement de RStudio différents types de fichiers. Les fonctions que vous avez exécutées (read.csv(), scan(), epub()) ont permis de lire et d'importer un seul fichier à la fois. Mais que feriez-vous si vous deviez, pour composer un corpus, lire et importer 10, 100, 1000 ou 10 000 fichiers? L'une des règles de la programmation se lit comme suit: "ne vous répétez pas", "Don't Repeat Yourself" (DRY). Pour bien suivre ce conseils et passer à un niveau supérieur d'efficacité, vous devrez apprendre les structures de contrôle.
+
+On peut séparer celles-ci en deux ensembles. Le premier, qui fait l'objet du présent atelier, est formé des structures itératives, les boucles. Celles-ci permettent de répéter une série d'instruction un nombre de fois déterminé (boucles for) ou indéterminé (boucle while). Le deuxième ensemble est formé des structures conditionnelles, que nous verrons dans le prochain atelier.

@@ -1,0 +1,3 @@
+"0","# Atelier 5"
+"0","if(!""ouvrages"" %in% ls()) {ouvrages <- readRDS(""donnees/ouvrages.RDS"")}"
+"0",""

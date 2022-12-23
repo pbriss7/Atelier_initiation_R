@@ -1,0 +1,68 @@
+# Par exemple, la présente ligne de code ne sera pas exécutée, car elle est précédée du croisillon.
+getwd() #La commande précédente sera exécutée, mais non le présent commentaire.
+getwd() #La commande précédente sera exécutée, mais non le présent commentaire.
+#| echo: false
+2 * 2
+#| echo: false
+2 * 2
+#| echo: true
+2 * 2
+rnorm(1)
+rnorm(1)
+## Obtenir de l'aide
+??base
+## Obtenir de l'aide
+help(package = 'base')
+## Obtenir de l'aide
+help(package = 'dplyr')
+```{r}
+install.packages("dplyr")
+library(dplyr)
+help(package = 'dplyr')
+#| echo: true
+install.packages("rstring") # Installation d'une extension
+library(rstring) # Activation d'une extension
+#| echo: true
+install.packages("stringr") # Installation d'une extension
+library(stringr) # Activation d'une extension
+help(package="stringr")
+??stringr
+??stringr
+help(package="stringr")
+?stringr::str_detect # Ce raccourci et produit un résultat similaire
+??proustr
+library(proustr) # Activation d'une extension
+help(package="proustr")
+??proustr # Ce raccourci et produit un résultat similaire
+?proustr::proust_random # Ce raccourci et produit un résultat similaire
+proust_random()
+proust_random(2)
+proust_random(count = 2, collapse = FALSE) # Essayez cette fonction
+proust_random(count = 2, collapse = true) # Essayez cette fonction
+proust_random(count = 2, collapse = TRUE) # Essayez cette fonction
+vignette(proustr)
+vignette("proustr")
+help(package="proustr")
+??proustr
+proust_random(count = 2, collapse = TRUE) # Essayez cette fonction
+#| echo: true
+?proustr::proust_random() # Ce raccourci produit un résultat similaire
+proust_random(count = 2) # Essayez cette fonction
+?proust_random()
+#| echo: false
+citation_proust <- proust_random(1)
+# Par exemple, la présente ligne de code ne sera pas exécutée, car elle est précédée du croisillon.
+getwd() #La commande précédente sera exécutée, mais non le présent commentaire.
+# La commande ci-dessus, une fois exécutée, renvoit le dossier de travail ("get working directory")
+#| echo: false
+2 * 2 # Exécuter cette ligne de code avec le raccourci.
+#| echo: false
+#| include: false
+install.packages("proustr") # Installation d'une extension
+library(proustr) # Activation d'une extension
+help(package="proustr")
+??proustr # Ce raccourci et produit un résultat similaire
+#| echo: false
+#| include: false
+?proust_random() # Ce raccourci produit un résultat similaire
+proust_random(count = 2) # Essayez cette fonction

@@ -1,0 +1,12 @@
+# Fonctions utiles
+
+# Installation et activation de fonctions
+activer_extensions <- function() {
+  activer_extension <- function(x) {
+    invisible(if(!x %in% rownames(installed.packages())) {install.packages(x)})
+    invisible(library(x, character.only=TRUE))
+  }
+  noms_extensions <- readline(prompt = "Quelles extensions activer? Sépare chaque nom d'extension par une virgule (ex.: data.table,dplyr,ggplot2) ")
+  noms_extensions_v <- strsplit(noms_extensions, ",") |> unlist()
+  invisible(sapply(noms_extensions_v, activer_extension))
+}

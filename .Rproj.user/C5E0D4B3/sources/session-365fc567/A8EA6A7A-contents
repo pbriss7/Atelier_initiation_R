@@ -1,0 +1,165 @@
+---
+title: "Atelier 6: importer des données textuelles"
+author: Pascal Brissette (U. McGill)
+date: 10 septembre 2022
+format: pdf
+editor: visual
+---
+
+[![Crédit photographique: Maksym Kaharlytskyi, Unsplash](images/maksym-kaharlytskyi-kDVaFjoQf4M-unsplash.jpg){fig-align="center"}](https://unsplash.com/photos/kDVaFjoQf4M)
+
+Avant d'explorer, de manipuler et d'analyser des données textuelles, il faut les importer dans l'environnement de travail de RStudio. La provenance de ces données peut être multiple. Selon les cas, elles peuvent être contenues dans une page Web, dans le tableau d'un article de Wikipédia, dans un fichier en libre-accès offert à partir d'un dépôt de données, sur un disque externe ou sur la mémoire de l'ordinateur. Le contenu de ces fichiers peut être très peu structuré, se présenter sous forme de table ou encore de document avec des balises. Les extensions et les fonctions qu'on doit utiliser dans chacun des cas peuvent différer. On utilisera, dans le cadre du présent atelier, des fonctions de base et une seule extension spécialisée, `epubr`. L'idée n'est pas de couvrir tous les cas de figure, mais les plus simples et les plus courants.
+
+## Lire un fichier de type .csv
+
+L'un de ces cas de figure est l'importation de données tabulaires contenues dans un fichier enregistré sur l'ordinateur. Nous allons importer dans l'environnement de travail de RStudio les données d'un fichier .csv (pour "coma-separated values") provenant de [Données Québec](https://www.donneesquebec.ca/). Le fichier, "publicationsqc.csv", a été téléchargés puis versés dans le dossier `donnees` de RStudio Cloud, où vous le trouverez. Ce jeu de données est présenté sur la [page suivante](https://www.donneesquebec.ca/recherche/dataset/documents_publies_quebec) du site de Données Québec; il contient "l'ensemble des documents (partitions musicales, publications officielles, livres, programmes de spectacles...) porteurs d'un ISBN qui ont été publiés au Québec depuis 2010 et acquis par dépôt légal, achat ou don". Comme il s'agit d'une format tabulaire (une table avec des colonnes et des lignes), on peut utiliser la fonction de base `read.csv()` pour lire et importer le contenu du document dans RStudio. Il faut assigner ce contenu à une variable pour ensuite pouvoir le manipuler. Ci-dessous, nous assignerons le contenu de la table à la variable `publications` (n'importe quel autre nom aurait fait l'affaire).
+
+Si vous consultez la documentation sur la fonction `read.csv()`, vous verrez que, pour l'utiliser, il faut fournir un argument appelé `file=`, soit le nom du chemin conduisant au fichier. De plus, sachant que la première ligne de la table importée contient le nom des colonnes, on indiquera la valeur `TRUE` à l'argument `header=`, et on précisera le codage du fichier avec `fileEncoding =` (on verra à la fin de cet atelier comment trouver cette information, qui n'est pas toujours requise).
+
+```{r read.csv}
+
+# Vous pouvez définir le chemin de manière absolue, à partir de la racine:
+chemin_absolu <- "/cloud/project/donnees/publicationsqc.csv"
+
+# Ou de manière relative, à partir du répertoire de travail
+chemin_relatif <- "donnees/publicationsqc.csv"
+
+# Le seul argument qu'on doit absolument fournir est le chemin du fichier (argument `file=`)
+publications <- read.csv(file = chemin_relatif,
+                         header = TRUE,
+                         fileEncoding = "WINDOWS-1252")
+
+# Même opération, à partir du chemin absolu
+# publications <- read.csv(file = chemin_absolu, header = TRUE, fileEncoding = "WINDOWS-1252")
+
+# Observer les cinq premières colonnes de la première ligne du tableau de données
+publications[1,1:5]
+```
+
+## Lire un fichier de type .txt
+
+Prenons maintenant un autre cas de figure, soit un fichier de format .txt téléchargé depuis le site du Projet Gutenberg et enregistré dans le dossier `donnees` de RStudio Cloud. Comme il ne s'agit pas de données structurées, on utilisera la fonction `scan()`, à laquelle on fournit le chemin du fichier. On doit également indiquer à la fonction de quel type de données il s'agit, et quel caractère la fonction doit utiliser pour créer les éléments du vecteur --- autrement, par défaut, la fonction utilisera les blancs séparant les mots).
+
+Dans l'exemple ci-dessous, on définit le chemin du fichier avec l'argument `file=`.
+
+```{r}
+# On définit le chemin relatif
+chemin_relatif2 <- "donnees/maria_chapdelaine.txt"
+
+# On associe le résultat de la commande à un nom quelconque, ici `maria`
+maria <- readLines(con = chemin_relatif2)
+
+# Observer les 20 premiers éléments du vecteur
+maria[1:20]
+```
+
+## Lire un fichier de type .txt depuis internet
+
+La fonction `readLines()` permet d'importer un fichier directement depuis internet. Vous n'avez pas à enregistrer au préalable le fichier dans un dossier. En guise d'argument `con=`, vous n'avez qu'à indiquer l'url du texte à importer.
+
+```{r}
+# Adresse url du roman de Louis Hémon, Maria Chapdelaine
+url <- "https://www.gutenberg.org/cache/epub/13525/pg13525.txt"
+
+# Importation du document
+maria_web <- readLines(con = url)
+
+```
+
+## Lire un fichier de type .epub
+
+Certains formats spécialisés sont plus complexes à importer que de simples fichiers .txt. Le format .epub, par exemple, créé pour la lecture sur tablette, pose des défis à l'opération d'importation. Il existe généralement une solution toute faite pour surmonter ces difficultés. Une recherche rapide dans votre moteur de recherche préféré vous conduira sans doute vers le site [Stack Overflow](https://stackoverflow.com/), où un utilisateur expérimenté vous suggérera l'utilisation de l'extension `epubr`. Installons cette extension, activons-là et inspectons son contenu.
+
+```{r}
+
+# Installation de l'extension
+# install.packages("epubr")
+
+# Activation de l'extension
+library(epubr)
+
+# Obtenir de l'aide sur l'extension
+??epubr
+
+# On comprend à la lecture de la viguette que la fonction clé de l'extension `epubr` est `epub()`. On peut demander de l'aide sur cette fonction spécifique
+
+?epub
+
+```
+
+Essayons maintenant d'importer le roman *La Scouine* d'Albert Laberge, téléchargé depuis le site de [*La bibliothèque électronique du Québec*](https://beq.ebooksgratuits.com/). Le document a été enregistré dans le dossier `donnees`.
+
+```{r}
+library(epubr)
+chemin_relatif3 <- "donnees/scouine.epub"
+scouine <- epubr::epub(file = chemin_relatif3)
+```
+
+L'extension `epubr` fournit des fonctions plus sophistiquées que l'extension `base`, dont les fonctions `read.csv()` et `readLines()` sont tirées. Le résultat de la fonction `epub()` est un tibble, c'est-à-dire un tableau de données pour ainsi dire "amélioré" (on y reviendra dans un atelier ultérieur). Le tableau issu de la lecture du fichier "scouine.epub" est similaire à ceux que produit l'extension `proustr` (voir l'Atelier 1). Il n'est cependant pas identique, car celui que nous venons d'importer emmagasine le texte dans une liste contenue dans la dernière colonne du tableau, la colonne \`data\`. Pour accéder à ces données, il faut donc se servir des principes d'indiçage que vous avez appris dans les ateliers antérieurs. C'est ce que nous ferons dans le prochain atelier portant sur l'observation des données.
+
+## Trouver le chemin des fichiers
+
+L'importation d'un fichier suppose que vous sachiez exactement où il se trouve dans la hiérarchie des dossiers. Trouver ce chemin est beaucoup moins compliqué qu'il n'y paraît! Il existe plusieurs manières d'y arriver. On en propose ici trois.
+
+### 1. Utiliser l'interface graphique.
+
+Dans RStudio, vous pouvez utiliser l'interface graphique. Sous l'onglet `Files`, vous naviguez vers le fichier que vous souhaitez importer. Les deux points `..` situés en haut de la fenêtre des dossiers vous permet, comme la flèche située tout juste à côté de ces deux points, de monter d'un cran dans la hiérarchie des dossiers. Une fois que vous avez repéré le fichier que vous souhaitez importer, vous cochez la case situé à sa gauche, cliquez ensuite la flèche descendante de l'onglet `More`, et choisissez l'option "Copy Folder Path to Clip Board".
+
+![](images/Capture%20d%E2%80%99e%CC%81cran,%20le%202022-09-10%20a%CC%80%2008.06.08.png)
+
+Le chemin du fichier se trouve maintenant dans votre presse-papier. Vous n'avez qu'à le "coller" dans votre fonction en prenant soin de l'encadrer de guillemets.
+
+### 2. Utiliser le Terminal
+
+L'utilisation du Terminal est sans doute moins conviviale et naturelle que celle de l'interface graphique, mais elle ne vous fait jamais défaut. Que vous soyez dans RStudio ou dans un autre programme, vous pourrez toujours y recourir avec assurance. Le Terminal est un programme qui permet de communiquer plus directement avec votre ordinateur. RStudio vous offre une fenêtre de terminal (voyez l'onglet à droite de l'onglet "Console", dans la fenêtre inférieure gauche).
+
+Il existe plusieurs ressources vous permettant d'apprendre le fonctionnement du Terminal. Voyez par exemple [cet article en français par Fabrice Neuman](https://www.commentcamarche.net/informatique/macos/1435-utiliser-les-commandes-du-terminal-de-macos/). Ici, on se contentera d'utiliser une seule commande permettant de trouver à tout coup le chemin d'un fichier, où qu'il se trouve. Cette commande est `find`:
+
+`find ~+ -type f -name "[nom du fichier]"`
+
+La commande est accompagnée de symboles qui peuvent paraître obscurs à priori. Ce que dit la ligne de commande est:
+
+-   `find` (trouve)
+
+-   `~+` (à partir du répertoire source)
+
+-   `-type f` (un élément de type fichier)
+
+-   `-name "[nom du fichier]"` (dont le nom est "...").
+
+Cette commande fonctionne dans RStudio Cloud, mais elle fonctionnera également dans tout environnement Mac (Linux). Vous pouvez ouvrir une fenêtre de terminal sur votre Mac et faire des essais.
+
+Les utilisateurs d'appareils fonctionnant dans un environnement Windows pourront utiliser la commande `Get-ChildItem` dans le PowerShell. Voir [cet article](https://www.tutos.eu/9402) pour plus de détails.
+
+## Résoudre les problèmes de codage
+
+Nous allons tenter d'importer à nouveau le tableau de données provenant de Données Québec, mais en supprimant l'argument `fileEncoding = "WINDOWS-1252"`.
+
+```{r}
+# publications <- read.csv(file = "/cloud/project/donnees/publicationsqc.csv",
+#                          header = TRUE)
+
+# View(publications)
+```
+
+R renvoit un message d'erreur, ayant détecté un problème de codage de caractères. Cela se produit lorsque les chaînes de caractères du fichier d'origine ne suivent pas le protocole d'encodage UTF-8. Vous trouverez ci-dessous quelques explications supplémentaires et, surtout, le moyen de palier ce problème.
+
+Lorsque vous lisez sur un écran des caractères formant les lettres de l'alphabet et les symboles usuels de la communication écrite, vous lisez des séries de codes interprétés par l'ordinateur selon des normes internationales. L'ordinateur, lui, ne comprend que les `0` et les `1`, organisés en séries. Ce qu'on appelle un "bit", en terme informatique, est une information de type `0` ou `1`. Ce qu'on appelle un octet est une séquence de 8 bits, et ainsi de suite. Pour que nous puissions lire la lettre "b" sur un écran, il faut fournir à l'ordinateur une clé associant un code à un caractère d'imprimerie (ici le "b"). Et pour que ce "b" soit lu tout à la fois par votre ordinateur et par des milliers d'autres ordinateurs, il faut que ces clés aient été acceptées comme norme. L'une des normes de codage de caractères les plus importantes s'appelle ASCII (pour "American Standard Code for Information Interchange", 1969), devenue la norme officielle de l'internet en 2015. Des extensions ont été créées depuis 1969 pour inclure des caractères d'imprimerie qui n'avaient pas été intégrés dans les premières versions de la norme ASCII, telles le Latin-1.
+
+La norme UTF-8, dévelopée par l'Organisation internationale de normalisation (ISO), tend à s'imposer de plus en plus dans l'échange d'informations, dont l'internet. En 2020, plus de [95% des communications](https://fr.wikipedia.org/wiki/UTF-8) se faisaient en UTF-8. Par défaut, l'UTF-8 est le codage utilisé dans R lorsque vous importez un fichier (vous pourrez vérifier cela en exécutant la fonction `Sys.getlocale("LC_ALL")`). Cependant, le fichier en question pourrait avoir été codé selon une autre norme à l'origine. Si tel est le cas, vos chaines de caractères seront encombrées de symboles dénués de sens et R, détectant ces problèmes, pourrait refuser d'importer le fichier dans l'environnement. C'est alors qu'il faut préciser à la fonction de lecture le type de codage du document original.
+
+Il y a plusieurs manières d'obtenir le codage original d'un document. La manière la plus sûre, qui vous évitera bien des recherches, est d'utiliser le puissant logiciel gratuit [OpenRefine](https://openrefine.org/) et d'importer dans ce logiciel le document dont vous souhaitez obtenir le codage. La première page que vous présentera OpenRefine, après avoir importé le fichier, contiendra cette information.
+
+![OpenRefine, fenêtre d'importation](images/openRefine.jpg){alt="OpenRefine, fenêtre d'importation"}
+
+Au milieu de l'écran, OpenRefine fournit le format des caractères, ici `WINDOWS-1252`. C'est l'information que vous pouvez inscrire entre guillemets dans la fonction `read.csv()` à l'argument `fileEncoding =`.
+
+## Références
+
+Sophie Baillargeon, [Lecture et écriture dans des fichiers externes à partir de R](https://stt4230.rbind.io/manipulation_donnees/lecture_ecriture_r/)
+
+Yves Marcoux, [Les jeux de caractères](https://marcoux.ebsi.umontreal.ca/enseign/6052/JeuxCar/JeuxCar.html)
+
+## Défi
+
+En guise de défi, vous pourrez importez les deux romans/documents dont la lecture est obligatoire dans le cadre du cours.

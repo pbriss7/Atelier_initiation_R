@@ -1,0 +1,174 @@
+---
+title: "Atelier 3: la matrice et le tableau de données"
+author: "Pascal Brissette"
+format: html
+editor: visual
+---
+
+[![Crédit photographique: Nathan Dumlao, Unsplash](images/nathan-dumlao-pnFPbmcWB7g-unsplash.jpg)](https://unsplash.com/photos/pnFPbmcWB7g)
+
+Le vecteur et la liste sont des structures unidimensionnelles. Celles que vous verrez dans le présent atelier sont à deux dimensions.
+
+## La matrice
+
+Une matrice est une structure de données homogène (atomique) comportant deux dimensions. Elle a des lignes et des colonnes, dont on peut obtenir les dimensions avec la fonction `dim()` ou encore avec les fonctions `str()`, `nrow()` et `ncol()`. Une matrice peut être créée soit en utilisant la fonction `matrix()`, soit assemblant un nombre donné de vecteurs de même longueur, composés du même type de données. Ci-dessous, `cbind()` crée une matrice en combinant les vecteurs par colonnes tandis que `rbinb()` les combine par rangées:
+
+```{r}
+#| echo: true
+
+dormeurV1 <- "C'est un trou de verdure où chante une rivière,"
+dormeurV2 <- "Accrochant follement aux herbes des haillons"
+dormeurV3 <- "D'argent ; où le soleil, de la montagne fière,"
+dormeurV4 <- "Luit : c'est un petit val qui mousse de rayons."
+
+dormeurS1 <- rbind(dormeurV1, dormeurV2, dormeurV3, dormeurV4)
+
+dim(dormeurS1)
+is.matrix(dormeurS1)
+dormeurS1
+
+```
+
+La matrice générée ci-dessus avec `rbind()` comporte quatre lignes (nos quatre vecteurs composés, chacun, d'un vers du "Dormeur du val" de Rimbaud) et une seule colonne. Chaque ligne ou "observation" a un nom, dont on peut obtenir la liste avec la fonction `rownames()`.
+
+Comme il s'agit d'une structure à deux dimensions, son indexation comporte deux entrées séparées par une virgule. On peut indexer les éléments de la matrice grâce à leur indice ou, si la matrice est pourvue de noms de lignes et de noms de colonnes, grâce à ces noms. Pour illustrer ce qu'on vient de dire, on va créer quatre nouveaux vecteurs, qu'on joindra à ceux de la matrice existante, ainsi qu'une colonne supplémentaire indiquant le numéro de la strophe correspondant à chacun des vers. De même, nous allons ajouter des noms de colonnes.
+
+
+```{r}
+#| echo: true
+
+dormeurV5 <- "Un soldat jeune, bouche ouverte, tête nue,"
+dormeurV6 <- "Et la nuque baignant dans le frais cresson bleu,"
+dormeurV7 <- "Dort ; il est étendu dans l'herbe sous la nue,"
+dormeurV8 <- "Pâle dans son lit vert où la lumière pleut."
+
+dormeurS2 <- rbind(dormeurV5, dormeurV6, dormeurV7, dormeurV8)
+
+dormeurS1_2 <- rbind(dormeurS1, dormeurS2)
+
+dim(dormeurS1_2)
+is.matrix(dormeurS1_2)
+class(dormeurS1_2)
+
+dormeur_col2 <- paste0("strophe_", 1:8)
+
+dormeurS1_2 <- cbind(dormeurS1_2, dormeur_col2)
+
+colnames(dormeurS1_2) <- c("Texte", "Strophe")
+
+dormeurS1_2
+
+```
+Le caractère atomique des matrices, qui peut sembler une contrainte à première vue, fait en réalité leur force. Leur type de données étant homogène, une fonction qui prend en entrée un vecteur pourra prendre une matrice et être appliquée à chacune des lignes. Dans la ligne de commande ci-dessous, la fonction `nchar()` calcule le nombre de caractères de chaque élément du tableau. On assignera le résultat à un objet appelé n_char. 
+
+
+```{r}
+#| echo: true
+n_char <- nchar(dormeurS1_2)
+n_char
+```
+
+L'objet créé comporte 8 lignes et deux colonnes. De quel type de structure s'agit-il à votre avis? Que se passerait-il si nous tentions d'assembler cette structure de données et la précédente? Essayez et observez le résultat.
+
+
+```{r}
+#| echo: true
+
+# Remplacez les astérisques par le nom de la fonction 
+
+# ***(n_char) # Quelle fonction vous permet de connaître le type de structure de l'objet n_char?
+
+# ***(dormeurS1_2, n_char) # Quelle fonction permet d'assembler les colonnes de deux objets similaires ?
+
+# Assemblons maintenant les deux structures
+
+```
+
+La fonction `matrix()` permet de créer une matrice à partir de rien. On fournit à la fonction un vecteur comportant un nombre donné d'éléments, et on indique avec les arguments `nrow=` et `ncol=` la manière de distribuer les éléments de ce vecteur. Dans l'exemple ci-dessoous, on crée un vecteur de 45 nombres entiers, qu'on répartit en 9 lignes et 5 colonnes.
+
+
+```{r}
+#| echo: true
+
+matrice_numerique <- matrix(sample(1:25), nrow = 5, ncol=5)
+matrice_numerique
+
+```
+Pour indexer un élément en particulier, on utilise les crochets simples et les indices correspondant à son numéro de ligne et de colonne, par convention **i** et **j**. Par défaut, si on ne fournit aucun chiffre en **i** ou en **j**, toutes les valeurs de la ligne (**i**) ou de la colonne (**j**) sont indexées.
+
+
+```{r}
+#| echo: true
+
+matrice_numerique[1,1]
+
+matrice_numerique[,3]
+
+matrice_numerique[2,]
+
+
+```
+
+La modification d’un ou de plusieurs éléments d’une matrice se fait par assignation:
+
+
+```{r}
+#| echo: true
+
+matrice_numerique[1,1] <- 77
+
+```
+
+
+On peut aisément transposer les lignes et les colonnes avec la fonction `t()`:
+
+
+```{r}
+#| echo: true
+
+matrice_numerique
+
+t(matrice_numerique)
+
+```
+Une matrice peut être multipliée par un vecteur, voire par une matrice. Prenons un exemple très simple: créons une petite matrice de 3 x 3 et multiplions-la par sa transposée:
+
+```{r}
+#| echo: true
+
+# Dans l'exemple ci-dessous, on crée les noms de lignes et de colonnes dès
+# la création de la matrice, avec l'argument `dimnames=`.
+
+autre_matrice_numerique <- matrix(1:9, nrow = 3, ncol = 3,
+                                  dimnames = list(c("ligne_1", "ligne_2", "ligne_3"),
+                                                  c("col_1", "col_2", "col_3"))
+                                  )
+
+autre_matrice_numerique * t(autre_matrice_numerique)
+```
+
+
+## Défi
+
+1. Donnez un nom à chaque ligne et à chaque colonne de l'objet `matrice_numerique`;
+
+2. Calculez la somme de chaque ligne de cette matrice avec la fonction `rowSums()` et assignez le vecteur résultant de ce calcul à un objet;
+
+3. Ajoutez ce vecteur à la matrice existante.
+
+
+```{r}
+#| echo: true
+
+colnames(matrice_numerique) <- paste0("colonne", 1:5)
+rownames(matrice_numerique) <- paste0("ligne", 1:3)
+
+somme <- rowSums(matrice_numerique)
+
+cbind(matrice_numerique, somme)
+
+```
+
+
+
+

@@ -1,0 +1,5 @@
+"0","plot(table(rc$COTE_MEDIAFILM), type = ""b"","
+"0","     main = ""Distribution des cotes Médiafilm\nLongs-métrages diffusés à R-C entre 2010 et 2022"","
+"0","     ylab = ""Nombre de longs-métrages"","
+"0","     xlab = ""Cote Média-film"")"
+"0",""

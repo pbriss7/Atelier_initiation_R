@@ -1,0 +1,6 @@
+"0","# Adresse url du roman de Louis Hémon, Maria Chapdelaine"
+"0","url <- ""https://www.gutenberg.org/cache/epub/13525/pg13525.txt"""
+"0",""
+"0","# Importation du document"
+"0","maria_web <- readLines(con = url)"
+"0",""

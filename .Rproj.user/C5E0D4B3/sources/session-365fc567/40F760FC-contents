@@ -1,0 +1,156 @@
+---
+title: "Atelier 2: le vecteur, un outil de travail essentiel"
+author: "Pascal Brissette (U. McGill)"
+date: 10 septembre 2022
+format: pdf
+editor: visual
+---
+
+[![Crédit photographique: Al Soot, Unsplash.com](images/al-soot-m37O5w7wx1w-unsplash.jpg)](https://unsplash.com/photos/m37O5w7wx1w)
+
+RStudio est l'environnement idéal pour travailler et mener vos expérimentations, mais vous devez apprendre à connaître vos outils de travail. Nous avons vu jusqu'ici
+
+-   des **fonctions** (`getwd()`, `c()`, `install.packages()`, etc.);
+
+-   une structure de données fondamentale, le **vecteur**;
+
+-   un type d'objet, la **chaîne de caractères**;
+
+-   des opérateurs (`<-`, `->`, `*`, `=`).
+
+Ajoutons quelques couleurs à notre palette.
+
+## D'autres types de données
+
+La chaîne de charactère que nous avons utilisée jusqu'ici est le plus "inclusif" des types de données: si nous voulions former un vecteur composé de données hétérogènes, R forcerait la conversion de ces dernières en chaînes de caractères. Voyez vous-même:
+
+```{r}
+#| echo: true
+
+mode(1.112)
+mode("Rimbaud")
+mode(FALSE)
+
+exemple <- c(1.112, FALSE)
+
+mode(exemple)
+
+exemple
+
+```
+
+Supprimez l'élément "Rimbaud" de l'objet `exemple` ci-dessus, exécutez à nouveau l'assignation, puis observez le résultat. Que se passe-t-il? Pouvez-vous reconstituer la logique de cette mutation?
+
+Il existe trois principaux types de données:
+
+-   `logicial` (TRUE / FALSE)
+
+-   `numeric` (ex.: 1, 1.2, -0.111)
+
+-   `character` (ex.: "Rimbaud")
+
+Une subtilité à prendre en considération: le type `numeric` se divise lui-même en deux sous-types, `double` et `integer`, soit les nombres réels et les nombres entiers. Le premier est "supérieur" au second et si on essaie de les rassembler dans un vecteur, R convertira le nombre entier en nombre décimal.
+
+```{r}
+#| echo: true
+
+typeof(1L) # La lettre "L" suivant le nombre entier indique à R qu'il doit le considérer comme tel (`integer`)
+
+typeof(c(1L, 12.1))
+
+c(1L, 1.11111) 
+
+```
+
+Les vecteurs peuvent donc être formés de n'importe quel type de données, pour autant qu'il s'agisse d'un type unique, sans quoi R forcera la conversion. Comment alors composer avec des données hétérogènes? C'est ici qu'interviennent les structures de données non atomiques.
+
+## Une autre structure unidimensionnelle
+
+La liste ressemble un peu au vecteur en ce qu'elle a une seule dimension. Cependant, elle n'est pas atomique comme le vecteur, elle rassemble des objets qui peuvent ne pas avoir la même structure, les mêmes dimensions et le même type de données. Les vecteurs sont atomiques, les listes sont dites **récursives**. Elles peuvent accepter des vecteurs, mais également d'autres listes et des structures de données à plusieurs dimensions. Si le vecteur se crée avec la fonction `c()`, la liste est générée avec la fonction `list()` et les éléments qu'on y insère sont séparés par des virgules. On peut, dès sa création, attribuer des noms aux éléments en utilisant l'opérateur `=` :
+
+```{r}
+#| echo: true
+
+liste1 <- list(entiers = c(1L,2L,3L),
+               decimales = c(1.1, 2.2, 3.3),
+               lettres = letters[1:3],
+               logiques = c(TRUE, FALSE, TRUE))
+
+str(liste1)
+
+liste1$entiers
+```
+
+Dans le premier atelier, on a utilisé l'analogie de la chemise pour décrire le vecteur. Ici, on pourrait utiliser celle du classeur à tiroirs. Chaque tiroir (chaque élément de la liste) peut contenir différentes chemises qui, à son tour, pourra contenir des documents écrits, des photographies, des cartes, des feuilles de calculs. Chaque tiroir peut recevoir une étiquette (le nom de l'élément). Comme toute analogie, celle-ci a ses limites, dans la mesure où, contrairement au classeur à tiroirs, la liste n'est pas limitée dans le nombre de niveaux de ses éléments (on pourrait avoir une liste de listes de listes de listes...).
+
+Composons maintenant une liste dont les éléments pourront ressembler aux matériaux avec lesquels des littéraires sont susceptibles de travailler. Elle sera composée de noms d'auteurs, de titres d'oeuvres et de dates.
+
+```{r}
+#| echo: true
+mes_oeuvres_l <- list(auteurs = c("Mercier", "Stael", "Hugo", "Zola"),
+                      oeuvres = c("Tableau de Paris", "Corinne", "Les Misérables", "La Débâcle"),
+                     annees_pub = c(1781L, 1807L, 1862L, 1892L))
+
+str(mes_oeuvres_l)
+
+```
+
+Comme nous l'avons fait avec les vecteurs, nous pouvons extraire n'importe lequel de ces éléments par indiçage (position ou nom). On ajoute, pour la liste, un raccourci qui consiste à utiliser l'opérateur `$` suivi du nom de l'objet à indicer:
+
+```{r}
+mes_oeuvres_l[[3]]
+mes_oeuvres_l[["oeuvres"]]
+mes_oeuvres_l$annees_pub
+```
+
+Pourquoi avoir utilisé les crochets doubles? Que se passera-t-il si nous utilisons des crochets simples? Pouvez-vous l'expliquer?
+
+```{r}
+mes_oeuvres_l[1]
+mes_oeuvres_l["oeuvres"]
+mes_oeuvres_l[3]
+
+str(mes_oeuvres_l)
+
+```
+
+L'indiçage de la liste avec crochets double renvoie la structure de données inférieure (ici un vecteur). Cela veut donc dire que nous pouvons isoler n'importe lequel des éléments composant les vecteurs formant la liste. Voyez:
+
+```{r}
+mes_oeuvres_l[[2]][1]
+mes_oeuvres_l[["oeuvres"]][1]
+mes_oeuvres_l$annees_pub[1]
+
+str(mes_oeuvres_l)
+```
+
+Ainsi, les crochets double isoleront la structure de données inférieure et, si cette structure inférieure est un vecteur composée de plusieurs éléments, les crochets simples permettront d'extraire cet élément.
+
+## Défi
+
+1.  Trouver un autre titre de Victor Hugo et remplacez, dans l'objet `mes_oeuvres_l`, le titre et l'année correspondant à celle de la publication de l'oeuvre choisie;
+
+2.  Ajouter un·e nouveau·elle auteur·trice à la liste, ainsi qu'un titre d'oeuvre et son année de publication;
+
+3.  Sauriez-vous ajouter un autre vecteur à cette liste qui puisse prendre des données logiques comme modalité? Exemple de nom pour ce vecteur: "deja_lu" (vous avez le droit de mentir dans les réponses...).
+
+```{r}
+
+```
+
+```{r}
+1. 
+mes_oeuvres_l[["oeuvres"]][3] <- "Le dernier jour d'un condamné"
+
+2. 
+mes_oeuvres_l$auteurs <- append(mes_oeuvres_l$auteurs, "Colet")
+mes_oeuvres_l$oeuvres <- append(mes_oeuvres_l$oeuvres, "Fleurs du Midi")
+mes_oeuvres_l$annees_pub <- append(mes_oeuvres_l$annees_pub, 1836)
+str(mes_oeuvres_l)
+
+mes_oeuvres_l$deja_lu <- c(TRUE, FALSE,TRUE,FALSE,TRUE)
+
+str(mes_oeuvres_l)
+
+data.frame(mes_oeuvres_l)
+```

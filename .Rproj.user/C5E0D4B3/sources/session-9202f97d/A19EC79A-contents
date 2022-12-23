@@ -1,0 +1,48 @@
+# Simple script permettant de visualiser des distributions statistiques et les tendances centrales
+library(data.table)
+library(ggplot2)
+
+film <- fread("donnees/filmographies_iconv.csv")
+
+# Observer le jeu de données
+str(film)
+
+# Ce graphique prend la variable ANNEE du tableau et présente un recensement du nombre d'individus (films) pour chacune des modalités (chacune des années) de la variable
+ggplot(film, aes(x=ANNEE))+
+  geom_histogram(binwidth = 1)+
+  theme_bw()+
+  ggtitle("Distribution annuelle des films produits par des femmes au Québec")+
+  labs(caption = "Données Québec")+
+  ylab("Nombre de films")+
+  xlab("Année")  
+
+# On peut observer la même distribution sous la forme d'un diagramme à lignes
+ggplot(film[, .N, "ANNEE"], aes(x=ANNEE, y=N))+
+  geom_line()+
+  ggtitle("Distribution annuelle des films produits par des femmes au Québec")+
+  labs(caption = "Données Québec")+
+  ylab("Nombre de films")+
+  xlab("Année")
+
+
+# On peut calculer la moyenne directement dans les données et ajouter une ligne qui la situe dans le graphique
+
+ggplot(film[, .N, "ANNEE"][, moyenne:=mean(N)], aes(x=ANNEE, y=N))+
+  geom_line()+
+  geom_line(aes(y=moyenne))+
+  ggtitle("Distribution annuelle des films produits par des femmes au Québec")+
+  labs(caption = "Données Québec")+
+  ylab("Nombre de films")+
+  xlab("Année")
+
+# On peut faire la même chose avec la médiane
+ggplot(film[, .N, "ANNEE"][, mediane:=median(N)], aes(x=ANNEE, y=N))+
+  geom_line()+
+  # geom_point()+
+  # geom_text(aes(label = N))+
+  geom_line(aes(y=mediane))+
+  # geom_boxplot()+
+  ggtitle("Distribution annuelle des films produits par des femmes au Québec")+
+  labs(caption = "Données Québec")+
+  ylab("Nombre de films")+
+  xlab("Année")

@@ -1,0 +1,3 @@
+"0",""
+"0","# On extrait toutes les lignes et uniquement les colonnes ""auteur.trice"" et ""annee.publication"""
+"0","ouvrages[ , c(""auteur.trice"", ""annee.publication"")]"

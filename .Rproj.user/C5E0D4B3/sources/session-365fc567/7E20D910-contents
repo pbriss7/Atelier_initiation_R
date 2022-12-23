@@ -1,0 +1,149 @@
+---
+title: "Atelier 8: observer les données"
+author: "Pascal Brissette"
+format: pdf
+editor: visual
+---
+
+![Crédit photographique: R for Social Scientists, Data Carpentry](images/Reading-297450.png){fig-align="center"}
+
+Dans le dernier atelier, vous avez pratiqué la lecture et l'importation de données dans l'environnement de travail. Il est temps d'observer ces données et de voir si le résultat correspond à vos besoins pour leur traitement ultérieur.
+
+Cet atelier présentera quelques fonctions utiles pour faire cette observation.
+
+## Les fonctions d'observation
+
+Vous avez déjà utilisé certaines fonctions vous permettant de connaître la longueur d'un vecteur ou d'une liste, la fonction `length()`. Cette fonction peut être appliquée à n'importe quelle structure de données. Dans le cas d'objets à une seule dimension --- vecteurs et listes ---, elle vous indiquera le nombre d'éléments dont il est formé; dans le cas de structures à deux ou plusieurs dimensions --- matrices, tableau de données, *arrays* (nous ne verrons pas dans ces ateliers d'initiation cette dernière structure) ---, la fonction renverra le nombre de colonnes de l'objet.
+
+Importons à nouveau le roman de Louis Hémon, *Maria Chapdelaine*. Nous allons observer cet objet, un vecteur, à l'aide de la fonction `length()`, puis avec la fonction `str()`, qui renvoit davantage d'informations.
+
+```{r}
+chemin_relatif2 <- "donnees/maria_chapdelaine.txt"
+
+# On associe le résultat de la commande à un nom quelconque, ici `maria`
+maria <- readLines(con = chemin_relatif2)
+
+length(maria)
+
+str(maria)
+```
+
+La fonction `length()` ne renvoit qu'un entier, soit le nombre d'éléments dont l'objet `maria` est formé. La fonction `str()` renvoit trois informations utiles: le type de données du vecteur (`chr)`, le nombre d'éléments dont cet objet est formé (`[1:6016]`), ainsi qu'un aperçu du premier élément ("The Project Gutenberg, etc."). Cette dernière fonction, `str()`, se révèle encore plus utile lorsque, au lieu d'un simple vecteur, on souhaite observer un objet comportant plus d'une dimension.
+
+Importons à nouveau le fichier provenant de Données Québec portant sur les publications soumises au dépôt légal depuis 2010, et observons-le avec les deux fonctions que nous venons d'utiliser, ainsi qu'avec les fonctions `nrow()` et `dim()`, qui fournissent respectivement le nombre de lignes d'un objet ayant plus d'une dimension, et l'ensemble des dimensions de l'objet.
+
+```{r}
+chemin_relatif <- "donnees/publicationsqc.csv"
+
+# Le seul argument qu'on doit absolument fournir est le chemin du fichier (argument `file=`)
+publications <- read.csv(file = chemin_relatif,
+                         header = TRUE,
+                         fileEncoding = "WINDOWS-1252")
+
+# Le nombre de colonnes du tableau
+length(publications)
+
+# Nombre de lignes
+nrow(publications)
+
+# Dimensions de l'objet
+dim(publications)
+
+# Informations sur l'objet (son type, ses dimensions, le nom des éléments ou objets dont il est composé, le type de données dont ils sont composés, ainsi qu'un aperçu des premiers éléments)
+str(publications)
+```
+
+Le résultat de `str()` pourra vous sembler d'un abord peu convivial, mais vous vous y habituerez rapidement! Celui-ci est composé des informations suivantes:
+
+-   Le type d'objet: `data.frame`;
+
+-   Le nombre de lignes (observations) et de colonnes (variables) de cet objet : `158929 obs. of  21 variables`;
+
+-   Le nom de chacune des colonnes ou variables, précédé de l'opérateur `$`;
+
+-   Vis-à-vis de chaque nom, le type de données dont la variable est composé: `chr`;
+
+-   Un aperçu du ou des premiers éléments de chaque variable.
+
+Si on est habitué de considérer des tableaux de données sous forme de lignes et de colonnes, à l'aide de logicitels tels Microsoft Excel ou Numbers, on trouvera peut-être que cette présentation des informations du tableau ne donne pas encore une bonne idée de la manière dont les données se présentent. On peut alors recourir à la fonction `View()`, qui fera apparaître une nouvelle fenêtre où les données seront présentées en deux dimensions. Vous pouvez essayer avec l'objet `publications` (n'oubliez pas de supprimer le croisillon avant d'exécuter l'instruction):
+
+```{r}
+# View(publications)
+```
+
+La fenêtre qui apparaît vous offre des options de filtrage et de présentation des données comme celles que vous trouveriez dans un logiciel comme Microsoft Excel. Les opérations que vous y ferez ne modifieront pas l'objet lui-même et vous pouvez donc manipuler la table sans crainte de faire des erreurs. Si vous arrêtez votre souris sur le nom d'une colonne, vous verrez apparaître le type de données dont elle est composée ainsi que la position de cette colonne dans le tableau. Cela pourrait être pratique pour indicer ou extraire des informations. Vous avez également, à la gauche du tableau, les noms de lignes. Par défaut, ces noms sont les numéros de ligne. Mais vous pourriez décider de modifier ces noms par assignation. Par exemple:
+
+```{r}
+rownames(publications) <- paste(1:nrow(publications), letters, sep = "-")
+```
+
+Vous pouvez rouvrir la table avec la fonction `View()` et observer le résultat.
+
+Qu'est-il arrivé au vecteur `letters`, composé seulement de 26 éléments?
+
+Lorsqu'on combine des vecteurs n'ayant pas le même nombre d'éléments, R ne renvoit pas de message d'erreur, mais il va **recycler** les éléments du vecteur le plus court. Il faut donc en être conscient et toujours inspecter le résultat de vos instructions.
+
+## Observer des données agrégées
+
+L'observation des données en format tabulaire est déjà une étape importante, mais l'exploration des données est une étape incontournable pour laquelle nous avons besoin de fonctions permettant d'agréger les données et de présenter des distributions diverses. La fonction `table()` permet par exemple de compter le nombre d'éléments d'un ou de plusieurs vecteurs appartenant à l'une ou l'autre des modalités. On appelle modalités les différentes "valeurs" que peuvent prendre les éléments d'un vecteur. Prenons un exemple concret. Importons dans l'environnement de RStudio un jeu de données déjà utilisé (Atelier 5) provenant de Données Québec. [Ce jeu de données](https://www.donneesquebec.ca/recherche/dataset/longs-metrages-diffuses-a-radio-canada) "répertorie les diffusions de longs métrages, tous genres confondus, à Radio-Canada, durant la décennie 2010". La fonction `str()`\` permettra d'explorer le jeu et les types de données.
+
+```{r}
+
+rc <- read.csv("donnees/rc_longs_metrages.csv", header = TRUE)
+
+str(rc)
+```
+
+À vue de nez, quatre variables pourraient facilement faire l'objet d'une agrégation dans ce jeu de données. La variable `PAYS_1` est composé de codes de pays à deux lettres (il serait surprenant d'avoir plus d'une cinquantaine de pays représentés), la variable `ANNÉE_PRODUCTION` est composée de modalités numériques correspondant aux années (nous savons qu'il n'y aura qu'une douzaine de modalités au plus (2010, 2011, 2012, ... 2022). La variable `COTE_MEDIAFILM`\` est également de type numérique et semble être une échelle de 1 à 5. Enfin, la variable `GENRE` est composée d'une série de catégories renvoyant à des genres de films. Contrairement aux titres et aux identifiants uniques, les quatre variables qu'on vient d'évoquer n'ont pas des modalités très différentes les unes des autres, et on suppose qu'il y aura des recoupements. C'est ce que les fonctions `unique()` et `table()` permettent d'observer. La première renverra un vecteur composé des modalités uniques d'un autre vecteur-colonne; la seconde renverra, pour chaque vecteur-colonne le nom des modalités uniques et le nombre d'éléments correspondant à chaque modalité. Prenons pour commencer la seule variable `COTE_MEIDAFILM` et observons sa distribution.
+
+```{r}
+unique(rc$COTE_MEDIAFILM)
+table(rc$COTE_MEDIAFILM)
+```
+
+Contrairement à ce que laissaient penser les premiers éléments du vecteur observés avec la fonction `str()`, la variable `COTE_MEIDAFILM` ne contient pas cinq, mais huit modalités (de 0 à 7)! Observons cette distribution sous forme de graphique à lignes et à points:
+
+```{r}
+plot(table(rc$COTE_MEDIAFILM), type = "b",
+     main = "Distribution des cotes Médiafilm\nLongs-métrages diffusés à R-C entre 2010 et 2022",
+     ylab = "Nombre de longs-métrages",
+     xlab = "Cote Média-film")
+
+```
+
+La même fonction `table()`, appliquée à la variable `GENRE`, donnera le résultat ci-dessous:
+
+```{r}
+table(rc$GENRE)
+```
+
+Il existe d'autres fonctions pour agréger les données, dont `aggregate()`. Le jeu de données utilisé jusqu'ici est peu adapté pour illustrer son intérêt. Utilisons l'un de ceux qui sont inclus dans l'extension de base de R, `mtcars`\*. Ce jeu de données présente des performances de véhicules de différentes marques automobiles. Les marques forment les noms de lignes et les variables incluent notamment le nombre de *miles* *per gallon*, `mpg`; le nombre de cylindres `cyl`; la transmission (automatique = 0 et manuelle = 1), `am`.
+
+```{r}
+str(mtcars)
+```
+
+Voyons les performances moyennes en `mpg`, toutes marques confondues, en fonction des deux autres variables (vous verrez mieux le résultat si vous copiez l'instruction et l'exécutez directement dans la console).
+
+```{r}
+aggregate(x = mtcars$mpg, by = list(raction = mtcars$am,
+                                    cylindres = mtcars$cyl), FUN = mean)
+
+# La fonction possède également une méthode par formule (opérateur ~) 
+aggregate(mpg ~ cyl, data = mtcars, FUN = mean)
+aggregate(mpg ~ am, data = mtcars, FUN = mean)
+```
+
+Cette dernière fonction a été simplifiée dans l'extension `data.table`, qui fera l'objet de l'Atelier 12. Ainsi, si le fonctionnement de cette fonction vous échappe, ne vous en faites pas: vous acquerrez bientôt des outils qui vous simplifieront l'existence!
+
+\* Si vous souhaitez explorer les jeux de données disponibles dans l'extension de base, exécutez la commande `data()`. Une liste des jeux de données, accompagnée pour chacun d'une courte description, s'ouvrira dans une fenêtre.
+
+## Défi
+
+1.  Agrégez les données du tableau `rc` selon les années de diffusion, et faites-en un graphique simple;
+
+2.  La fonction `read.tsv()` est similaire à la fonction `read.csv()` que vous connaissez maintenant très bien. Dans un fichier de format .csv, les données sont séparées par des virgules, tandis qu'elles sont séparées par une tabulation dans un fichier de format .tsv. Utiliser la fonction `read.tsv()` pour importer le fichier filmographies_realisatrices_qc.tsv qui se trouve dans le dossier des données et examinez-en le contenu avec les fonctions que vous avez apprises dans cet atelier.
+
+    Pour plus d'information sur ce jeu de données, [consultez cette page de Données Québec](https://www.donneesquebec.ca/recherche/dataset/filmographies_realisatrices_equitables).
+
+    N'hésitez pas à consulter la documentation sur la fonction `read.tsv()`, au besoin.

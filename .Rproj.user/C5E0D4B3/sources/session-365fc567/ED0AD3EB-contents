@@ -1,0 +1,132 @@
+---
+title: "Atelier 10: fonctions ifelse() et apply()"
+author: "Pascal Brissette (U. McGill)"
+format: pdf
+editor: visual
+---
+
+Les structures de contrôle vues dans l'atelier précédant sont puissantes et importantes en contexte de programmation, mais dans bien des cas, des fonctions un peu plus simples d'utilisation feront pleinement l'affaire et pourront avantageusement remplacer ces structures. Dans le présent atelier, nous allons présenter la fonction `ifelse()` et quelques-unes des fonctions de la famille de fonctions `apply()`.
+
+## La fonction `ifelse()`
+
+La fonction de base `ifelse()` est à la fois très simple et très pratique. Elle comporte trois arguments: 1) un test; 2) une instruction à exécuter si l'issue du test est `TRUE`; 3) une instruction à exécuter si l'issue du test est `FALSE`.
+
+Nous allons lire et importer la filmographie des réalisatrices québécoises [décrite sur Données Québec](https://www.donneesquebec.ca/recherche/dataset/filmographies_realisatrices_equitables).
+
+```{r}
+realisatrices <- read.csv2("donnees/filmographies_realisatrices_qc.tsv", sep = "\t", fileEncoding = "WINDOWS-1252")
+```
+
+Ce jeu de données est composé de 1739 lignes et de 14 colonnes. Vous pouvez visualiser les premières lignes ou les dernières lignes du jeu de données avec les fonctions `head()` et `tail()`. N'hésitez pas à pousser l'observation des données avec les fonctions apprises dans l'Atelier 8 (`str()`, `View()`, etc.).
+
+Nous allons ajouter une colonne à ce tableau indiquant si le film a été réalisé au XXe siècle ou au XXIe siècle. Il n'y aura donc que deux options possibles. Le test, qui forme le premier argument de la fonction ifelse() et qui doit renvoyer une valeur logique (`TRUE` / `FALSE`), peut se présenter comme suit :
+
+```{r}
+# realisatrices$ANNEE < 2000
+```
+
+Le deuxième argument de la fonction est formé de l'instruction en cas de résultat `TRUE` et le troisième argument doit comprendre l'instruction en cas de résultat `FALSE`. L'instruction complète se présente comme suit:
+
+```{r}
+
+realisatrices$PERIODE <- ifelse(test = realisatrices$ANNEE < 2000, 
+                                yes = "XXe", 
+                                no = "XXIe")
+
+
+# Observation du résultat
+table(realisatrices$PERIODE)
+# View(realisatrices[, c("ANNEE", "PERIODE")])
+
+```
+
+Comme l'objet fourni en entrée à `ifelse()` est un vecteur de même type et de même dimension que le vecteur créé (`realisatrices$PERIODE`), l'opération n'a pas à être exécutée à l'aide d'une boucle: elle est dite "vectorielle". Est-ce à dire qu'une boucle ne conviendrait pas? Non, elle donnera le même résultat au final:
+
+```{r}
+for(i in 1:nrow(realisatrices)){
+  realisatrices$PERIODE[i] <- ifelse(test = realisatrices$ANNEE[i] < 2000, 
+                                     yes =  "XXe", 
+                                     no = "XXIe")
+  }
+
+# Observation du résultat
+table(realisatrices$PERIODE)
+# View(realisatrices[, c("ANNEE", "PERIODE")])
+
+```
+
+Cependant, elle sera plus lente, considérablement plus lente (69 fois plus lente), comme le montre ce test effectué avec l'extension `rbenchmark`:
+
+```{r}
+if(!"rbenchmark" %in% rownames(installed.packages())) {install.packages("rbenchmark")}
+library(rbenchmark)
+
+rbenchmark::benchmark(
+  operation_vectorielle = 
+    realisatrices$PERIODE <- ifelse(test = realisatrices$ANNEE < 2000, 
+                                yes = "XXe", 
+                                no = "XXIe"),
+  boucle = 
+    for(i in 1:nrow(realisatrices)){
+  realisatrices$PERIODE[i] <- ifelse(test = realisatrices$ANNEE[i] < 2000, 
+                                     yes =  "XXe", 
+                                     no = "XXIe")
+  }
+)
+
+```
+
+### La famille de fonctions `apply()`
+
+La famille de fonctions `apply()` permet d'appliquer une fonction sur chaque élément d'un objet récursif. La fonction de base est `apply()`, qui permet d'appliquer une fonction à des lignes ou des colonnes d'une matrice ou d'un tableau de données. Composons une matrice pour illustrer cette fonction. Dans la première instruction `apply()`, la somme sera calculée sur la base des lignes (argument `MARGIN=1`), dans la deuxième instruction, elle sera calculée sur la base des colonnes (argument `MARGIN=2`). Le résultat de chacune des instructions sera un simple vecteur fournissant la somme des lignes ou des colonnes.
+
+```{r}
+ma_matrice <- matrix(1:25, nrow = 5, ncol = 5)
+
+apply(X = ma_matrice, MARGIN = 1, FUN = sum)
+apply(X = ma_matrice, MARGIN = 2, FUN = sum)
+```
+
+Les "saveurs" `sapply()` et `lapply()` de cette famille prennent en entrée un vecteur ou une liste et retourne un vecteur (`sapply()`) ou une liste (`lapply()`) de la même longueur que les objets fournis en entrée. Elles appliqueront une fonction à chacun des éléments du vecteur ou de la liste entrants. Prenons un exemple très simple pour commencer. Soit le tableau de données realisatrices importé au début de l'atelier. Supposons que nous souhaitions savoir de quel type de données chaque colonne du tableau est composé. Nous pourrions insérer la fonction `class()` à l'intérieur de `sapply()` ou de `lapply()`, et celles-ci appliqueraient la fonction `class()` à chacune des colonnes du tableau, puis renverrait le résultat de cette fonction sous forme de vecteur ou de liste.
+
+```{r}
+sapply(realisatrices, class)
+lapply(realisatrices, class)
+
+```
+
+Prenons un exemple un peu plus réaliste. Vous trouverez dans le dossier donnees de votre environnement un sous-dossier appelé fichiers_xls. Vous pourriez avoir des centaines, voire des milliers de fichiers de ce type à lire et à importer dans votre environnement pour constituer votre corpus. Vous ne voudriez pas avoir à faire cette opération manuellement. Vous pourriez utiliser la fonction `dir()` pour composer un vecteur comprenant tous les noms de fichiers de ce dossier, auxquels vous aurez apposé le chemin vers ce sous-dossier, puis utiliser la fonction xlsx pour lire et importer ces fichiers:
+
+```{r}
+if(!"xlsx" %in% rownames(installed.packages())) {install.packages("xlsx")}
+library(xlsx)
+
+# Nom du chemin vers le dossier où se trouvent les fichiers à importer
+chemin_v <- paste0(getwd(), "/", "donnees/fichiers_xls/")
+
+# Vecteur des fichiers .xls contenus dans le dossier
+nomsFichiers_v <- dir(path=chemin_v, pattern=".*xls")
+
+# Assemblage du chemin vers le dossier et des noms de fichiers
+nomsFichiers_v <- paste0(chemin_v, nomsFichiers_v)
+
+# Lecture et importation de chacun des fichiers dans une liste
+fichiers_l <- lapply(nomsFichiers_v, xlsx::read.xlsx, 1)
+
+```
+
+Il ne reste plus qu'à assembler les différents éléments des tableaux importés pour en faire un unique tableau de données.
+
+## Défi
+
+Importez tout d'abord un jeu de données que nous n'avons pas encore exploré, "actes_criminels.csv". Celui-ci provient de [Données Québec](https://www.donneesquebec.ca/recherche/dataset/vmtl-actes-criminels) et sa source est le Service de police de la Ville de Montréal (SPVM).
+
+```{r}
+
+# Remplacez les astérisques ci-dessous par une fonction d'importation et exécutez-la.
+# crimes <- ***("donnees/actes_criminels.csv")
+
+```
+
+1.  À l'aide de la fonction `ifelse()`, créez une nouvelle colonne dont les modalités seront fondées sur le type de crime exprimé dans la première colonne. Il vous faudra considérer les modalités uniques de cette colonne, déterminer quels types sont "graves" et lesquels sont "tres_graves" (vous pouvez utiliser d'autres variables selon l'inspiration du moment), puis utiliser la fonction `ifelse()` pour générer la nouvelle colonne.
+2.  À l'aide des fonctions `sapply()` et `lapply()`, vérifiez le type de données de chacune des colonnes.
