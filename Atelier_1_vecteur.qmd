@@ -26,19 +26,20 @@ Pour créer un "projet R", vous pouvez cliquer sur l'icône ![](images/RProject.
 
 Dans un script R, les caractères qui suivent un croisillon `#` ne sont pas exécutés. Vous pouvez donc vous servir de ce symbole pour insérer des titres ou des commentaires dans votre script.
 
-Il est toujours recommandé de commenter votre code, d'indiquer ce que les lignes de commandes sont censées produire, ce que vous souhaitez faire. Ces commentaires vous seront utiles lorsque, quelques jours, semaines ou mois plus tard, vous reprendrez le travail ou souhaiterez vous en inspirer pour créer une autre tâche. En cas de pépin ou de blocage ("troubleshooting"), ces commentaires indiqueront aux personnes qui vous aident quelle logique vous avez suivie.
+Il est toujours recommandé de commenter votre code, d'indiquer ce que les fonctions et opérations sont censées produire, ce que vous souhaitez faire. Ces commentaires vous seront utiles lorsque, quelques jours, semaines ou mois plus tard, vous reprendrez le travail ou souhaiterez vous en inspirer pour créer une autre tâche. En cas de pépin ou de blocage, ces commentaires indiqueront aux personnes qui vous aident quelle logique vous avez suivie.
 
 ```{r}
 # La présente ligne ne sera pas exécutée, car elle est précédée du croisillon.
 
-list.files("donnees") #La commande précédente sera exécutée, mais non ce commentaire.
+# La ligne suivante sera lue par R comme une commande.
+list.files("donnees")
 
 # Que semble produire la fonction que vous venez d'exécuter? Dans quel contexte pourriez-vous devoir l'utiliser?
 ```
 
 Dans un script R de base, le résultat de la commande n'apparaît que dans la fenêtre "Console". Dans un document Quarto comme celui-ci, le résultat apparaît également sous les lignes de code ("code chunk").
 
-Pour exécuter une commande, vous pouvez, dans un document Quarto, cliquer sur la flèche à la droite de la fenêtre de code ou encore mettre votre curseur au début de la ligne de code et utiliser le raccourci `Command+Enter`.
+Pour exécuter une commande, vous pouvez, dans un document Quarto, cliquer sur la flèche à la droite de la fenêtre de code ou encore mettre votre curseur au début de la ligne de code et utiliser le raccourci `Command + Enter`.
 
 ```{r}
 
@@ -47,21 +48,21 @@ Pour exécuter une commande, vous pouvez, dans un document Quarto, cliquer sur l
 
 ## Obtenir de l'aide
 
-À tout moment, sans même sortir de l'environnement de travail, on peut obtenir de l'aide sur une fonction en particulier ou sur une extension ("package").
+À tout moment, sans même sortir de l'environnement de travail, on peut obtenir de l'aide sur une fonction en particulier ou sur une extension (ou "package").
 
 ### Documentation sur les extensions
 
-| Pour illustrer le travail avec les extensions, nous utiliserons `proustr`, créé par Colin Fay en 2017. Cette extension contient les sept romans composant *La Recherche du temps perdu* de Marcel Proust, ainsi que la liste de tous les personnages de la *Recherche* et des fonctions permettant par exemple de choisir des citations au hasard.
+| Pour illustrer le travail avec les extensions, nous utiliserons `proustr`, créé par Colin Fay en 2017. Cette extension contient les sept romans composant *La Recherche du temps perdu* de Marcel Proust, ainsi que la liste de tous les personnages de la *Recherche*. L'extension contient également des fonctions permettant par exemple de choisir des citations au hasard.
 
 On peut obtenir de l'aide sur une extension une fois qu'elle a été installée (si elle ne l'est pas déjà) et activée (ce sont des opérations distinctes). Pour installer une extension, on utilise la fonction `install.packages("...")`, et pour activer la même extension, on utilise la fonction `library()`. Quant à la documentation de l'extension, elle sera appelée par la fonction `help(package="...")`. Elle apparaîtra dans la fenêtre inférieure droite de RStudio, sous l'onglet "Help".
 
 **Note**: pour éviter les messages d'erreur, n'oubliez pas de mettre le nom de l'extension entre guillemets lorsque vous l'installez. Une fois installée, cette extension devient un objet et peut donc être appelée par son nom d'objet, sans guillemets.
 
-**Rappel**: vous trouverez toutes les extensions approuvées par l'équipe de RStudio sur [CRAN("Comprehensive R Archive Network")](%22https://cran.r-project.org/%22). Il y en a plus de 18 000 en ce mois d'août 2022.
+**Rappel**: vous trouverez toutes les extensions approuvées par l'équipe de RStudio sur [CRAN("Comprehensive R Archive Network")](%22https://cran.r-project.org/%22). Il y en a plus de 21 400 en ce mois d'octobre 2024.
 
 ```{r}
 
-# install.packages("proustr") # Installation d'une extension
+install.packages("proustr") # Installation d'une extension
 
 library(proustr) # Activation d'une extension
 
@@ -79,12 +80,12 @@ Pour obtenir de l'aide sur une fonction en particulier, on écrit son nom préc�
 
 ?proust_random()
 
-proust_random(count = 2) # Essayez cette fonction. Que renvoie-t-elle selon vous?
+proust_random(count = 2) # Essayez cette fonction. Que génère-t-elle?
 ```
 
 ### Créer ses premiers objets
 
-Dans R, tout est un objet dont on peut voir et explorer le contenu, qu'on peut manipuler et modifier. Les fonctions que vous créerez, les calculs que vous ferez, les graphiques que vous produirez, tout pourra être encapsulé dans des "conteneurs" et devenir un objet nommé. À tout moment, vous pouvez obtenir la liste de vos objets avec la fonction `ls()`. Dans RStudio, ces derniers sont rassemblés dans la fenêtre supérieure droite, sous l'onglet (par défaut) "Environnement".
+Dans R, tout est un objet dont on peut voir et explorer le contenu, qu'on peut manipuler et modifier. Les fonctions que vous créerez, les calculs que vous ferez, les graphiques que vous produirez, tout pourra être encapsulé dans des "conteneurs" et devenir un objet nommé. À tout moment, vous pouvez obtenir la liste de vos objets avec la fonction `ls()`. Dans RStudio, ces objets sont rassemblés dans la fenêtre supérieure droite, sous l'onglet (par défaut) "Environnement".
 
 Pour créer un objet, on utilise l'opérateur `<-`. Cet opérateur prend la forme d'une flèche; il associe à une variable le résultat de la ligne de commande qui se trouve à sa droite.
 
@@ -98,7 +99,7 @@ citation_proust_2 <- proust_random(5) # Création d'un deuxième objet
 
 ls()
 
-# Par convention, on utilise l'opérateur <- pour les assignations et le symbole `=` pour définir les arguments d'une fonction, mais les deux fonctionnent pour l'assignation. on peut même utiliser la flèche inverse `->` en prenant soin de permuter commandes et nom d'objet.
+# Par convention, on utilise l'opérateur <- pour les assignations et le symbole `=` pour définir les arguments d'une fonction, mais les deux fonctionnent pour l'assignation.
 
 ```
 
@@ -114,7 +115,7 @@ Enfin, vous utiliserez idéalement des noms qui traduisent au mieux le contenu d
 
 ## Les principaux types d'objets
 
-Les deux objets que nous avons créés dans la section précédente sont des vecteurs de longueur 1. Il ne faut pas confondre la longueur de la chaîne de caractères, c'est-à-dire le nombre de caractères que contient une chaîne, et la longueur d'un objet, soit le nombre d'éléments dont il est constitué. Le nombre de caractères d'une chaîne peut être obtenue avec la fonction `nchar()`, tandis que la longueur de l'objet est obtenue avec `length()`.
+Les deux objets que nous avons créés dans la section précédente sont des vecteurs de longueur 1. Il ne faut pas confondre la longueur de la chaîne de caractères, c'est-à-dire le nombre de caractères que contient une chaîne, et la longueur d'un objet, soit le nombre d'éléments dont il est constitué. Le nombre de caractères d'une chaîne peut être obtenu avec la fonction `nchar()`, tandis que la longueur de l'objet est obtenue avec `length()`.
 
 ```{r}
 
