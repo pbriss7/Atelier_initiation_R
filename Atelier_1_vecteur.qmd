@@ -126,7 +126,7 @@ length(citation_proust_1)
 
 Le vecteur est l'unité de base de R, la structure de données élémentaire. Toutes les autres sont construites à partir de vecteurs. Il est donc essentiel de savoir les explorer et les manipuler.
 
-Le vecteur peut être comparé à un dossier (une "chemise") qui ne pourrait contenir qu'un seul type de document (des photos OU des documents écrits OU des feuilles de calcul, etc.). Il s'agit d'une structure de données homogène ou, pour utiliser le vocabulaire courant, « atomique ». Si vous essayez de concaténer des données de divers types, c'est-à-dire d'en faire un vecteur, R forcera leur homogénéisation. Les deux objets que nous avons créés avec la fonction `proust_random()` sont de type `character`. Cependant,
+Le vecteur peut être comparé à un dossier (une "chemise") qui ne pourrait contenir qu'un seul type de document (des photos OU des documents écrits OU des feuilles de calcul, etc.). Il s'agit d'une structure de données homogène ou, pour utiliser le vocabulaire courant, « atomique ». Si vous essayez de concaténer des données de divers types, c'est-à-dire d'en faire un vecteur, R forcera leur homogénéisation. Les deux objets que nous avons créés avec la fonction `proust_random()` sont de type `character`.
 
 ```{r}
 
@@ -205,6 +205,7 @@ R contient, dès son chargement, une multitude de vecteurs prêts à être utili
 
 ```{r}
 mes_lettres <- letters
+mes_lettres
 length(mes_lettres)
 
 identical(mes_lettres, letters) # la fonction `identical()` vérifie l'identité entre les objets de chaque côté de la virgule.
