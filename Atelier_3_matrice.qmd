@@ -43,9 +43,9 @@ rownames(dormeurS1)
 
 La matrice générée ci-dessus avec `rbind()` comporte quatre lignes (nos quatre vecteurs) et une seule colonne. Chaque ligne a un nom, dont on peut obtenir la liste avec la fonction `rownames()`.
 
-### Indiçage de la matrice
+### Manipuler une matrice
 
-Comme il s'agit d'une structure à deux dimensions, l'indiçage d'une matrice comporte deux arguments séparés par une virgule `[ , ]`. On peut cibler les éléments de la matrice grâce à leur indice numérique ou, si la matrice est pourvue de noms de lignes et de noms de colonnes, grâce à ces noms. Pour illustrer ce qu'on vient de dire, on va créer quatre nouveaux vecteurs, qu'on joindra à ceux de la matrice existante, ainsi qu'une colonne supplémentaire indiquant le numéro de chaque vers. De même, nous allons ajouter des noms de colonnes.
+Comme il s'agit d'une structure à deux dimensions (lignes et colonnes), la matrice comporte deux arguments, deux indices séparés par une virgule `[ , ]`. On peut cibler les éléments de la matrice grâce à ces indices numériques ou, si la matrice est pourvue de noms de lignes et de noms de colonnes, grâce à ces noms. Pour illustrer ce qu'on vient de dire, on va créer quatre nouveaux vecteurs, qu'on joindra à ceux de la matrice existante, ainsi qu'une colonne supplémentaire indiquant le numéro de chaque vers. De même, nous allons ajouter des noms de colonnes.
 
 ```{r}
 #| echo: true
@@ -75,15 +75,15 @@ dormeurS1_2
 
 ### Les opérations matricielles
 
-Le caractère atomique des matrices, qui peut sembler une contrainte à première vue, fait en réalité leur force. Leur type de données étant homogène, une fonction qui prend en entrée un vecteur pourra prendre une matrice et être appliquée à chacun de ses éléments. Dans la ligne de commandes ci-dessous, la fonction `nchar()` calcule le nombre de caractères de chaque élément du tableau. On assignera le résultat à une variable, `n_char`. Souvenons-nous que la matrice comprend 2 X 8 vecteurs, donc 16 éléments en tout.
+Le caractère atomique des matrices, qui peut sembler une contrainte à première vue, fait en réalité leur force. Leur type de données étant homogène, une fonction qui prend en entrée un vecteur pourra également prendre une matrice et être appliquée à chacun de ses éléments. Dans la ligne de commandes ci-dessous, la fonction `nchar()` calcule le nombre de caractères de chaque élément d'un vecteur. On assignera le résultat à une variable, `nbre_caracteres`. Souvenons-nous que la matrice comprend 2 X 8 vecteurs, donc 16 éléments en tout.
 
 ```{r}
 #| echo: true
 
 dim(dormeurS1_2)
 
-n_caracteres_elements <- nchar(dormeurS1_2)
-n_caracteres_elements
+nbre_caracteres <- nchar(dormeurS1_2)
+nbre_caracteres
 ```
 
 À quel type de structure l'objet ainsi créé correspond-il? Pouvez vous le vérifier? Que se passerait-il si nous tentions d'assembler cette structure de données et la précédente? Essayez et observez le résultat. Dans les lignes de commandes ci-dessous, vous devrez remplacer les astérisques par le nom de la fonction et supprimer le croisillon pour les exécuter.
@@ -92,13 +92,13 @@ n_caracteres_elements
 #| echo: true
 
 # Vérification du type de structure
-class(n_caracteres_elements)
+class(nbre_caracteres)
 
 # Remplacez les astérisques par le nom de la fonction 
 
-is.matrix(n_caracteres_elements) # Quelle fonction vous permet de connaître le type de structure de l'objet n_char?
+is.matrix(nbre_caracteres) # Quelle fonction vous permet de connaître le type de structure de l'objet n_char?
 
-cbind(dormeurS1_2, n_caracteres_elements) # Quelle fonction permet d'assembler les colonnes de deux objets similaires ?
+cbind(dormeurS1_2, nbre_caracteres) # Quelle fonction permet d'assembler les colonnes de deux objets similaires ?
 
 # Assemblons maintenant les deux structures
 
@@ -134,7 +134,7 @@ La modification d'un ou de plusieurs éléments d'une matrice se fait par assign
 
 ```{r}
 #| echo: true
-
+# La ligne de code écrasera la valeur initiale de l'élément [1,1] par la valeur 100.
 matrice_numerique[1,1] <- 100
 matrice_numerique
 
@@ -173,7 +173,6 @@ autre_matrice_numerique*3
 autre_matrice_numerique*c(3,4,5)
 
 ```
-
 
 ## Défi
 
