@@ -1,28 +1,18 @@
 ---
-title: "Atelier 2: le vecteur, un outil de travail essentiel"
+title: "Atelier 2: la liste"
 author: "Pascal Brissette (U. McGill)"
-date: 10 septembre 2022
+date: février 2023
 format: pdf
 editor: visual
 ---
 
 [![Crédit photographique: Al Soot, Unsplash.com](images/al-soot-m37O5w7wx1w-unsplash.jpg)](https://unsplash.com/photos/m37O5w7wx1w)
 
-RStudio est l'environnement idéal pour travailler et mener vos expérimentations, mais vous devez apprendre à connaître vos outils de travail. Nous avons vu jusqu'ici
-
--   des **fonctions** (`getwd()`, `c()`, `install.packages()`, etc.);
-
--   une structure de données fondamentale, le **vecteur**;
-
--   un type d'objet, la **chaîne de caractères**;
-
--   des opérateurs (`<-`, `->`, `*`, `=`).
-
-Ajoutons quelques couleurs à notre palette.
+Dans le premier atelier, nous avons introduit la structure de données première de R, le **vecteur**, ainsi qu'un type de données forcément très utilisé dans l'analyse de textes, la **chaine de caractères**.
 
 ## D'autres types de données
 
-La chaîne de charactère que nous avons utilisée jusqu'ici est le plus "inclusif" des types de données: si nous voulions former un vecteur composé de données hétérogènes, R forcerait la conversion de ces dernières en chaînes de caractères. Voyez vous-même:
+La chaîne de charactères que nous avons utilisée dans le premier atelier est le plus "inclusif" des types de données: si nous voulions former un vecteur composé de données hétérogènes, R forcerait la conversion de ces dernières en chaînes de caractères.
 
 ```{r}
 #| echo: true
@@ -31,7 +21,7 @@ mode(1.112)
 mode("Rimbaud")
 mode(FALSE)
 
-exemple <- c(1.112, FALSE)
+exemple <- c(1.112, FALSE, "Rimbaud")
 
 mode(exemple)
 
@@ -98,8 +88,10 @@ str(mes_oeuvres_l)
 Comme nous l'avons fait avec les vecteurs, nous pouvons extraire n'importe lequel de ces éléments par indiçage (position ou nom). On ajoute, pour la liste, un raccourci qui consiste à utiliser l'opérateur `$` suivi du nom de l'objet à indicer:
 
 ```{r}
+# Les trois lignes suivantes génèrent le même résultat.
+
 mes_oeuvres_l[[3]]
-mes_oeuvres_l[["oeuvres"]]
+mes_oeuvres_l[["annees_pub"]]
 mes_oeuvres_l$annees_pub
 ```
 
