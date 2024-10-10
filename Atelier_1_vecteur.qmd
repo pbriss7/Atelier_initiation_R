@@ -1,35 +1,37 @@
 ---
-title: "Atelier 1: le studio"
+title: "Atelier 1: RStudio"
 author: "Pascal Brissette (U. McGill)"
-date: 10 septembre 2022
+date: février 2023
 format: pdf
 editor: visual
 ---
 
 ![Crédit photographique: Matthieu Comoy, Unsplash](images/matthieu-comoy-koo_vYrlU_U-unsplash.jpg){fig-alt="https://unsplash.com/photos/koo_vYrlU_U"}
 
-##### Cet atelier propose une initiation à l'environnement RStudio et aux commandes de base du langage R. Il est destiné aux personnes n'ayant aucune formation en programmation. Les concepts et fonctions qu'on y présente pourront paraître a priori éloignés de l'analyse de texte, mais ils y conduisent! Prenez le temps de vous familiariser avec votre environnement de travail et les fonctions de base.
+Cet atelier propose une initiation à l'environnement RStudio et à la structure de données de base de R, le vecteur. Il est destiné aux étudiant·e·s et chercheur·euse·s en sciences humaines sans formation en programmation.
 
 ## RStudio: environnement de travail et d'expérimentation
 
-Votre lieu de travail est RStudio, dont le nom changera prochainement pour [Posit](%22https://www.rstudio.com/blog/rstudio-is-becoming-posit/#:~:text=RStudio%20is%20becoming%20Posit%20%2D%20RStudio&text=Today%20we%20are%20very%20excited,this%20and%20what%20it%20means.%22). La version locale de RStudio suppose l'installation préalable de [R](%22https://cran.r-project.org/%22) et de [RStudio](%22https://www.rstudio.com/products/rstudio/download/%22). Comme les raccourcis peuvent varier selon le système d'exploitation de l'ordinateur, nous allons, par souci de simplicité, utiliser la version "Cloud" de RStudio, [RStudio Cloud](%22https://rstudio.cloud/%22).
+Votre lieu de travail s'appelle RStudio ou [Posit](%22https://www.rstudio.com/blog/rstudio-is-becoming-posit/#:~:text=RStudio%20is%20becoming%20Posit%20%2D%20RStudio&text=Today%20we%20are%20very%20excited,this%20and%20what%20it%20means.%22). Il s'agit d'un véritable terrain de jeu et d'expérimentation. Pour pouvoir l'utiliser, vous devrez au préalable installer la dernière version du langage [R](%22https://cran.r-project.org/%22) et, bien sûr, [RStudio](%22https://www.rstudio.com/products/rstudio/download/%22).
 
-Une fois dans votre environnement de travail, vous ouvrirez le volet Enseignement, qui vous a été partagé, et le projet "FREN 498 Ateliers et exercices". Vous devriez alors voir une fenêtre ressemblant à celle-ci:
+## Qu'est-ce qu'un projet R?
 
-## ![](images/RStudioCloud.jpg)
+Si vous créez un script où, par exemple, vous demandez à R de lire un jeu de données contenu dans un répertoire de votre ordinateur, le chemin utilisé par R pour lire ces données est fixé à partir de la racine de votre ordinateur. Si vous transmettez votre script et vos données à un collègue pour qu'il reproduise les résultats et vous donne son avis, ce dernier devra modifier le chemin d'accès aux données parce que celles-ci se trouvent désormais sur son ordinateur. Cela est peut rendre laborieux la reproduction des flux de travail.
 
-Vous pouvez alors ouvrir le fichier intitulé \`Atelier 1.qmd\`, qui contient le présent script.
+La création préalable d'un "projet R" permet notamment d'éviter ces changements de chemins et rend possible l'exécution des scripts où quel que soit l'environnement où ils sont placés. Un "projet R" se présente comme un conteneur où vous ferez vos expérimentations et déposerez vos scripts et données. Lorsque viendra le temps de partager votre travail, c'est le conteneur au complet que vous déplacerez et son ouverture dans un autre environnement se fera sans qu'il soit nécessaire de modifier le chemin ni d'installer les extensions qui ont été utilisées lors de la création du projet.
+
+Pour créer un "projet R", vous pouvez cliquer sur l'icône ![](images/RProject.png){width="15"}située dans la barre d'outils. Vous pouvez également utiliser le menu principal File/New Project... Vous trouverez plus de détails sur l'utilisation des projets R et de bons conseils sur la structuration des dossiers à l'intérieur d'un "projet R" dans [cet article](https://www.r-bloggers.com/2020/01/rstudio-projects-and-working-directories-a-beginners-guide/) de Martin Chan.
 
 ## Exécuter ou ne pas exécuter les commandes...
 
 Dans un script R, les caractères qui suivent un croisillon `#` ne sont pas exécutés. Vous pouvez donc vous servir de ce symbole pour insérer des titres ou des commentaires dans votre script.
 
-Il est toujours recommandé de commenter votre code, d'indiquer ce que les lignes de commandes sont supposées donner, ce que vous souhaitez faire. Ces commentaires vous seront utiles lorsque, quelques jours, semaines ou mois plus tard, vous reprendrez le travail ou souhaiterez vous en inspirer pour créer une autre tâche. En cas de pépin ou de blocage ("troubleshooting"), ces commentaires indiqueront aux personnes qui vous aident quelle logique vous avez suivie.
+Il est toujours recommandé de commenter votre code, d'indiquer ce que les lignes de commandes sont censées produire, ce que vous souhaitez faire. Ces commentaires vous seront utiles lorsque, quelques jours, semaines ou mois plus tard, vous reprendrez le travail ou souhaiterez vous en inspirer pour créer une autre tâche. En cas de pépin ou de blocage ("troubleshooting"), ces commentaires indiqueront aux personnes qui vous aident quelle logique vous avez suivie.
 
 ```{r}
 # La présente ligne ne sera pas exécutée, car elle est précédée du croisillon.
 
-getwd() #La commande précédente sera exécutée, mais non ce commentaire.
+list.files("donnees") #La commande précédente sera exécutée, mais non ce commentaire.
 
 # Que semble produire la fonction que vous venez d'exécuter? Dans quel contexte pourriez-vous devoir l'utiliser?
 ```
@@ -39,7 +41,7 @@ Dans un script R de base, le résultat de la commande n'apparaît que dans la fe
 Pour exécuter une commande, vous pouvez, dans un document Quarto, cliquer sur la flèche à la droite de la fenêtre de code ou encore mettre votre curseur au début de la ligne de code et utiliser le raccourci `Command+Enter`.
 
 ```{r}
-#| echo: true
+
 2 * 2 # Exécuter cette ligne de code avec le raccourci.
 ```
 
@@ -49,7 +51,7 @@ Pour exécuter une commande, vous pouvez, dans un document Quarto, cliquer sur l
 
 ### Documentation sur les extensions
 
-| Pour illustrer le travail avec les extensions, nous utilserons `proustr`, créé par Colin Fay en 2017. Cette extension contient les sept romans composant la Recherche du temps perdu de Marcel Proust, ainsi que la liste de tous les personnages de la Recherche et des fonctions permettant par exemple de choisir des citations au hasard.
+| Pour illustrer le travail avec les extensions, nous utiliserons `proustr`, créé par Colin Fay en 2017. Cette extension contient les sept romans composant *La Recherche du temps perdu* de Marcel Proust, ainsi que la liste de tous les personnages de la *Recherche* et des fonctions permettant par exemple de choisir des citations au hasard.
 
 On peut obtenir de l'aide sur une extension une fois qu'elle a été installée (si elle ne l'est pas déjà) et activée (ce sont des opérations distinctes). Pour installer une extension, on utilise la fonction `install.packages("...")`, et pour activer la même extension, on utilise la fonction `library()`. Quant à la documentation de l'extension, elle sera appelée par la fonction `help(package="...")`. Elle apparaîtra dans la fenêtre inférieure droite de RStudio, sous l'onglet "Help".
 
@@ -58,15 +60,14 @@ On peut obtenir de l'aide sur une extension une fois qu'elle a été installée 
 **Rappel**: vous trouverez toutes les extensions approuvées par l'équipe de RStudio sur [CRAN("Comprehensive R Archive Network")](%22https://cran.r-project.org/%22). Il y en a plus de 18 000 en ce mois d'août 2022.
 
 ```{r}
-#| echo: true
 
-install.packages("proustr") # Installation d'une extension
+# install.packages("proustr") # Installation d'une extension
 
 library(proustr) # Activation d'une extension
 
 help(package="proustr")
 
-??proustr # Ce raccourci produit un résultat similaire
+??proustr # Ce raccourci produit un résultat similaire.
 
 ```
 
@@ -75,21 +76,19 @@ Disons-le tout de suite: la documentation a un aspect assez austère. Lorsque vo
 Pour obtenir de l'aide sur une fonction en particulier, on écrit son nom précédé d'un point d'interrogation.
 
 ```{r}
-#| echo: true
 
-?proust_random() # Ce raccourci produit un résultat similaire
+?proust_random()
 
-proust_random(count = 2) # Essayez cette fonction
+proust_random(count = 2) # Essayez cette fonction. Que renvoie-t-elle selon vous?
 ```
 
 ### Créer ses premiers objets
 
-Dans R, tout est un objet dont on peut voir et explorer le contenu, qu'on peut manipuler et modifier. Les fonctions que vous créerez, les calculs que vous ferez, les graphiques que vous produirez, tout pourra être encapsulé dans des "conteneurs" et devenir un objet nommé. À tout moment, vous pouvez obtenir la liste de vos objets avec la fonction `ls()`. Dans RStudio, ces derniers sont rassemblés dans la fenêtre supérieure droite, sous l'onglet (par défaut) Environnement.
+Dans R, tout est un objet dont on peut voir et explorer le contenu, qu'on peut manipuler et modifier. Les fonctions que vous créerez, les calculs que vous ferez, les graphiques que vous produirez, tout pourra être encapsulé dans des "conteneurs" et devenir un objet nommé. À tout moment, vous pouvez obtenir la liste de vos objets avec la fonction `ls()`. Dans RStudio, ces derniers sont rassemblés dans la fenêtre supérieure droite, sous l'onglet (par défaut) "Environnement".
 
 Pour créer un objet, on utilise l'opérateur `<-`. Cet opérateur prend la forme d'une flèche; il associe à une variable le résultat de la ligne de commande qui se trouve à sa droite.
 
 ```{r}
-#| echo: true
 
 # La fonction proust_random() renvoie une citation aléatoire 
 # tirée de La Recherche du temps perdu de Proust. 
@@ -103,19 +102,19 @@ ls()
 
 ```
 
-Pour composer le nom d'un objet et pouvoir l'inscrire dans l'environnement de travail, on peut utiliser un mélange de lettres et de chiffres. Il faut cependant éviter:
+Pour composer le nom d'un objet et pouvoir l'inscrire dans l'environnement de travail, on peut utiliser un mélange de lettres et de chiffres. Il faut cependant éviter d'utiliser:
 
--   de placer un chiffre en début de ligne
+-   un chiffre en début de ligne;
 
--   d'utiliser des lettres accentuées et des espaces
+-   des lettres accentuées et des espaces;
 
--   d'utiliser, comme nom d'objet, des noms de fonctions existantes (ex.: length, dim, apply).
+-   des noms de fonctions existantes (ex.: length, dim, apply), soit des mots réservés.
 
 Enfin, vous utiliserez idéalement des noms qui traduisent au mieux le contenu de l'objet.
 
 ## Les principaux types d'objets
 
-Les deux objets que nous avons créés dans la section précédente sont des vecteurs de longueur 1. Il ne faut pas confondre la longueur de la chaîne de caractères et la longueur de la structure de données (ici un vecteur). Le nombre de caractères d'une chaîne peut être obtenue avec la fonction `nchar()`, tandis que la longueur de l'objet est obtenu avec `length()`.
+Les deux objets que nous avons créés dans la section précédente sont des vecteurs de longueur 1. Il ne faut pas confondre la longueur de la chaîne de caractères, c'est-à-dire le nombre de caractères que contient une chaîne, et la longueur d'un objet, soit le nombre d'éléments dont il est constitué. Le nombre de caractères d'une chaîne peut être obtenue avec la fonction `nchar()`, tandis que la longueur de l'objet est obtenue avec `length()`.
 
 ```{r}
 
@@ -126,23 +125,21 @@ length(citation_proust_1)
 
 Le vecteur est l'unité de base de R, la structure de données élémentaire. Toutes les autres sont construites à partir de vecteurs. Il est donc essentiel de savoir les explorer et les manipuler.
 
-Le vecteur peut être comparé à un dossier (une "chemise") qui ne pourrait contenir qu'un seul type de document (photo OU documents écrits OU feuille de calcul, etc.). Il s'agit d'une structure de données homogène ou, pour utiliser le vocabulaire courant, « atomique ». Si vous essayez de concaténer des données de divers types, R forcera leur homogénéisation. Les deux objets que nous avons créés sont de type `character`, tandis que la fonction reprise de l'extension proustr est de type... `function`.
+Le vecteur peut être comparé à un dossier (une "chemise") qui ne pourrait contenir qu'un seul type de document (des photos OU des documents écrits OU des feuilles de calcul, etc.). Il s'agit d'une structure de données homogène ou, pour utiliser le vocabulaire courant, « atomique ». Si vous essayez de concaténer des données de divers types, c'est-à-dire d'en faire un vecteur, R forcera leur homogénéisation. Les deux objets que nous avons créés avec la fonction `proust_random()` sont de type `character`. Cependant,
 
 ```{r}
 
 mode(citation_proust_1)
 
-mode(proust_random) # Les fonctions sont aussi des objets dans R et, à ce titre, ils possèdent leur propre structure et type
-
 ```
 
-On peut joindre des vecteurs de même type avec la fonction `c()` ("c" pour "concatenate") et les assigner à un nouvel objet:
+On peut assembler des vecteurs de même type avec la fonction `c()` ("c" pour "concatenate") et les assigner à un nouvel objet:
 
 ```{r}
 
 citation_proutst1_2 <- c(citation_proust_1, citation_proust_2)
 
-print(citation_proutst1_2) # Observer le résultat
+print(citation_proutst1_2) # Observez le résultat
 
 length(citation_proutst1_2)
 
@@ -175,7 +172,7 @@ length(citation_proutst1_2)
 
 ```
 
-On peut attribuer des noms aux éléments d'un vecteur. Cela permettra ultérieurement d'extraire l'élément à partir de ce nom au lieu d'avoir à utiliser son indice numérique (position dans le vecteur).
+On peut attribuer des noms aux éléments d'un vecteur. Cela permettra ultérieurement d'extraire l'élément à partir de ce nom au lieu d'avoir à utiliser son indice numérique (position dans le vecteur). On dira qu'un vecteur possède un attribut `names`, attribut qu'on peut définir avec la fonction `names()`.
 
 ```{r}
 
@@ -188,7 +185,7 @@ citation_proutst1_2["Citation1"] # Extraction de l'élément grâce au nom
 
 ```
 
-Si on souhaite éliminer ou remplacer un élément du vecteur, on l'isole avec son indice ou son nom, et on assigne à cet indice une nouvelle modalité.
+Si on souhaite éliminer un élément du vecteur, on peut l'isoler avec son indice ou son nom, et lui assigner la valeur `NULL`. Si on veut plutôt en modifier le contenu, on l'isole avec son indice ou son nom, puis on lui assigne un nouveau contenu (l'écrasement du contenu antérieur est automatique).
 
 ```{r}
 
@@ -209,10 +206,10 @@ R contient, dès son chargement, une multitude de vecteurs prêts à être utili
 mes_lettres <- letters
 length(mes_lettres)
 
-identical(mes_lettres, letters)
+identical(mes_lettres, letters) # la fonction `identical()` vérifie l'identité entre les objets de chaque côté de la virgule.
 ```
 
-Chaque lettre de ce vecteur est isolée des autres, comme le montrent les guillemets encadrant chaque élément. On pourrait --- et c'est une chose que vous ferez sur une base régulière --- assembler ces éléments en une seule chaîne de caractères. Cela se fait avec la fonction `paste()`. Cette fonction prend comme arguments une série de vecteurs à assembler `(...)`, un séparateur entre les vecteurs à assembler `sep =`, ainsi qu'une option d'amalgame des éléments de ces vecteurs `collapse =`. Essayez cette fonction avec le vecteur `letters` ou avec `citation_proutst1_2`.
+Chaque lettre du vecteur `letters` est isolée des autres, comme le montrent les guillemets encadrant chaque élément. On pourrait --- et c'est une chose que vous ferez sur une base régulière --- assembler ces éléments en une seule chaîne de caractères. Cela se fait avec la fonction `paste()`. Cette fonction prend comme arguments une série de vecteurs à assembler `(...)`, un séparateur entre les vecteurs à assembler `sep =`, ainsi qu'une option d'amalgame des éléments de ces vecteurs `collapse =`. Essayez cette fonction avec le vecteur `letters` ou avec `citation_proutst1_2`.
 
 ```{r}
 ?paste
@@ -236,7 +233,25 @@ gc() # Permet de libérer l'espace mémoire non utilisée
 
 ```
 
-## Petit défi
+## Liste des fonctions utilisées dans cet atelier
+
+| Nom de la fonction | Extension d'origine | Ce que la fonction produit ou renvoie |
+|-------------------|-------------------|----------------------------------|
+| `list.files()` | base | Un vecteur contenant les noms des éléments d'un dossier |
+| `install.packages()` | base | L'installation d'une extension à partir de CRAN |
+| `library()` | base | L'activation d'une extension installée |
+| `help()` | base | La documentation sur une fonction ou une extension |
+| `proust_random()` | proustr | Une phrase tirée de *La Recherche du temps perdu* |
+| `nchar()` | base | Le nombre de caractères d'une chaine |
+| `length()` | base | Le nombre d'éléments d'un objet. Appliquée à une table, la fonction renverra le nombre de colonnes. |
+| `mode()` | base | Le type de structure d'un objet |
+| `print()` | base | Le contenu d'un objet |
+| `str()` | base | La structure d'un objet |
+| `identical()` | base | L'identité de deux objets. Renvoie TRUE si les objets sont identiques et FALSE s'il y a la moindre différence entre les deux objets. |
+| `c()` | base | Un vecteur d'une longueur équivalente au nombre d'éléments concaténés, tous du même type. |
+| `paste()` | base | Un vecteur de type `character` combinant deux ou plusieurs autres vecteurs. |
+
+## Défi
 
 1.  Assignez à cinq objets différents une citation aléatoire de Proust composée chacune d'une seule phrase;
 
@@ -244,7 +259,7 @@ gc() # Permet de libérer l'espace mémoire non utilisée
 
 3.  Amalgamez (collez) le premier et le dernier élément de ce vecteur, en les séparant avec une série d'astérisques `*******`.
 
-4.  Faites une copie du vecteur `letters`\`.
+4.  Faites une copie du vecteur `letters`.
 
 5.  Utilisez l'indiçage et la fonction `paste()` pour former le mot "abc".
 
