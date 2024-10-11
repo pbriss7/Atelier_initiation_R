@@ -10,11 +10,11 @@ editor: visual
 
 ## Le tableau de données
 
-Le tableau de données, ou "data frame" en anglais, est sans doute la structure la plus utilisée dans l'analyse des données textuelles (et des données en règle générale). Il permet d'assembler en une seule structure une série de colonnes formées de vecteurs. C'est dire que chaque colonne est composée d'un et d'un seul type de données, mais que deux colonnes ou plus peuvent être de différents types. Le tableau de données partage donc avec la liste la capacité d'assembler des données hétérogènes, c'est un objet récursif; mais, contrairement à la liste, il ne les isole pas, il les dispose en lignes et en colonnes. À l'opposée de la matrice, cependant, le tableau de données ne permet pas de faire une opération sur tous les éléments qu'il contient sans devoir accomplir une boucle sur chaque ligne ou colonne (selon la fonction utilisée).
+Un tableau de données en R, aussi appelé data frame, est semblable à une feuille Excel : c’est une structure rectangulaire où chaque colonne contient un type de données (comme des nombres, du texte, ou des catégories). Les lignes représentent des observations, et les colonnes sont des variables. Un tableau peut contenir plusieurs types de données dans ses colonnes, mais chaque colonne doit être homogène, c’est-à-dire qu’elle ne peut contenir qu’un seul type de données (par exemple, une colonne ne peut contenir à la fois des chiffres et du texte).
 
 ### Créer un tableau de données
 
-Le tableau de données peut être créé avec la fonction `data frame()`, auquel on fournit des vecteurs. La procédure est similaire à la création d'une liste. On peut attribuer un nom à chaque vecteur et ce nom deviendra celui de la colonne dans le tableau.
+Un tableau de données peut être créé à partir de vecteurs (des listes d’éléments) à l’aide de la fonction data.frame(). Chaque vecteur deviendra une colonne dans le tableau.
 
 ```{r}
 # Création d'un tableau de données comprenant des noms d'auteur.trices, des titres
@@ -25,12 +25,12 @@ ouvrages <- data.frame(auteur.trice = c("Mercier", "Stael", "Hugo", "Sand", "Zol
                        annee.publication = c(1781L, 1807L, 1862L, 1837L, 1892L),
                        est.femme = c(FALSE, TRUE, FALSE, TRUE, FALSE))
 
-ouvrages
+print(ouvrages)
 ```
 
 ### Extraire des éléments d'un tableau de données.
 
-Dans un tableau de données, les lignes sont des *observations* et les colonnes, des *variables*. Chaque variable, tel qu'indiqué ci-dessus, est d'un seul type. Comme dans le cas de la matrice, un ou plusieurs éléments peuvent être sélectionnés selon leur position ***i***,***j***.
+Les lignes d’un tableau de données sont appelées observations, et les colonnes, variables. Vous pouvez extraire des éléments spécifiques du tableau en utilisant les positions des lignes et colonnes, comme ceci :
 
 ```{r}
 
@@ -38,12 +38,12 @@ ouvrages[1,2] # On extrait l'élément au croisement de la ligne 1 et de la colo
 
 ouvrages[c(1,2), c(3)] # On extrait les éléments au croisement des lignes 1 et 2, et de la colonne 3
 
-ouvrages[ ,1:3] # On extrait TOUS les éléments de la colonne 1 (l'absence d'indice conduit à l'inclusion de tous les éléments)
+ouvrages[ ,1:3] # On extrait toutes les valeurs de la première ligne, pour les colonnes 1 à 3.
 
 ouvrages[1,] # On extrait TOUS les éléments de la première ligne
 ```
 
-Comme la liste, le tableau de données autorise l'indiçage de données à l'aide de l'opérateur `$`, suivi du nom de la colonne.
+Vous pouvez aussi accéder à une colonne spécifique en utilisant son nom avec l'opérateur $ :
 
 ```{r extraction}
 
@@ -60,7 +60,7 @@ ouvrages$est.femme[1:3]
 
 ### Ajouter des colonnes à un tableau de données
 
-L'ajout d'observations ou de variables, après la création du tableau, se fait par assignation, avec l'opérateur `<-`. L'ajout d'une colonne et de ses valeurs est simple, car chaque colonne, on s'en rappelle, constitue un vecteur formé d'un type unique de données.
+Pour ajouter une nouvelle colonne à un tableau, il suffit d’assigner un vecteur à une nouvelle colonne :
 
 ```{r ajout-colonne}
 
@@ -76,55 +76,38 @@ colnames(ouvrages)[ncol(ouvrages)] <- "genre.litteraire"
 # On observe le résultat
 str(ouvrages)
 
-ouvrages
+print(ouvrages)
 ```
 
 ### Ajouter des lignes à un tableau de données
 
-L'ajout d'une ligne est un peu moins simple, car une ligne, dans un tableau de données, peut être composée de plusieurs types de données (la colonne 1 peut contenir des nombres entiers, la deuxième colonne peut contenir des chaînes de caractères, etc.). On ne peut donc se contenter d'assigner un vecteur de données `c(...)` à une nouvelle ligne, puisqu'un vecteur doit être composé d'un et d'un seul type de données. On peut cependant utiliser une liste, qui accepte des données hétérogènes :
+L’ajout d’une nouvelle ligne est un peu plus complexe car chaque colonne peut contenir des types de données différents. Vous pouvez ajouter une ligne en utilisant une liste pour regrouper les différentes données :
 
 ```{r ajout-ligne}
 str(ouvrages)
 
 ouvrages[6,] <- list("Rachilde", "La Marquise de Sade", 1887, TRUE, "roman")
-
-```
-
-La plupart du temps, vous ne connaissez pas d'emblée le nombre de lignes de votre tableau et ne pouvez donc savoir à quel numéro de ligne assigner la nouvelle liste de données. Si par mégarde vous assignez de nouvelles données à une ligne existante, vous allez *remplacer* les données de cette ligne par les nouvelles et donc les détruire. Et ce n'est pas tout! Dans des opérations comme des boucles, l'ordinateur sera laissé à lui-même et vous ne pourrez pas même lui indiquer le numéro de la ligne où doivent entrer les nouvelles données. Que faire?
-
-Une méthode simple consiste à insérer dans la zone d'indiçage ***i*** une fonction simple qui dit à R de renvoyer le nombre de lignes du tableau, à quoi vous ajouterez 1 avec une simple addition! Voyez ci-dessous:
-
-```{r ajout-ligne-nrow}
-
-# La fonction `nrow()` renvoit le nombre de ligne d'une structure à deux dimensions. Essayez-là!
-nrow(ouvrages)
-
-# Insérons maintenant cette commande dans la zone d'indiçage des lignes du tableau
-ouvrages[nrow(ouvrages)+1,] <- list("Louise Colet", "Les fleurs du midi", 1836, TRUE, "poésie")
+ouvrages[7,] <- list("Louise Colet", "Les fleurs du midi", 1836, TRUE, "poésie")
 
 ouvrages
+
 ```
 
-Voilà, R n'a pas écrasé la dernière ligne de votre tableau. Il a simplement ajouté la nouvelle ligne de données.
-
-Vous pourrez, pour exécuter la même opération, recourir à la fonction de base `rbind()`, qui assemble les lignes d'un tableau de données. Cette option est sans doute plus élégante, mais elle ne fait rien de plus que l'opération vue ci-dessus.
+On peut également ajouter une ligne à un tableau en utilisant la fonction `rbind()`. C'est une méthode plus simple que la précédente.
 
 ```{r ajout-ligne-rbind}
 
-# La fonction `nrow()` renvoit le nombre de ligne d'une structure à deux dimensions
 ouvrages <- rbind(ouvrages,
                   list("Lamartine", "Méditations poétiques", 1820, FALSE, "poésie"))
 
 ouvrages
 ```
 
-C'est l'occasion de rappeler que, dans R, il y a très souvent plus d'une manière d'accomplir une tâche.
+### Réorganiser les colonnes
 
-### Modifier l'ordre des colonnes
+Nous avons maintenant un tableau intéressant, mais les données ne sont pas aussi bien organisées qu'elles pourraient l'être. Par exemple, la variable qui fournit une information sur le genre de l'auteur.trice, `est.femme`, devrait apparaître tout juste après la variable `auteur.trice`, non entre `annee.publication` et `genre.litteraire`. Du côté des lignes, le principe le plus commun d'organisation, dans des tableaux de ce type, est chronologique. On pourrait donc ordonner les lignes en fonction des valeurs de la colonne `annee.publication`. 
 
-Nous avons maintenant un tableau intéressant, mais les données ne sont pas aussi bien organisées qu'elles pourraient l'être. Par exemple, la variable qui fournit une information sur le genre de l'auteur.trice, `est.femme`, devrait apparaître tout juste après la variable `auteur.trice`, non entre `annee.publication` et `genre.litteraire`. Du côté des lignes, le principe le plus commun d'organisation, dans des tableaux de ce type, est chronologique. On pourrait donc ordonner les lignes en fonction des valeurs de la colonne `annee.publication`. Nous ferons plus loin dans les cours des manipulations de structures plus complexes, mais voyons dès maintenant comment faire ces manipulations de base sans recourir à des fonctions spécialisées.
-
-La modification de l'ordre des colonnes peut se faire très simplement en fournissant un vecteur numérique indiquant le nouvel ordre proposé (les indices numériques correspondent, dans un tel vecteur, à la position de la colonne dans le tableau). Vous pouvez également, en lieu et place d'un vecteur numérique, fournir à R un vecteur comprenant les noms des colonnes selon l'ordre souhaité.
+La modification de l'ordre des colonnes peut se faire très simplement en fournissant un vecteur numérique indiquant le nouvel ordre proposé (les indices numériques correspondent, dans un tel vecteur, à la position de la colonne dans le tableau). Vous pouvez également fournir à R un vecteur comprenant les noms des colonnes selon l'ordre souhaité.
 
 ```{r réordonner-colonnes}
 
@@ -142,15 +125,15 @@ ouvrages
 
 ### Modifier l'ordre des lignes
 
-Pour modifier l'ordre des lignes, maintenant, le plus simple est de recourir à la fonction `order()` qui, comme son nom l'indique, établit un ordre dans un vecteur numérique, et de l'offrir en argument ***i*** dans l'indiçage du tableau de données.
+Pour modifier l'ordre des lignes, le plus simple est de recourir à la fonction `order()` qui, comme son nom l'indique, établit un ordre dans un vecteur numérique.
 
 ```{r ordre-chronologique}
 
-# Nous voulons ordonner les LIGNES du tableau en fonction des annee.publicationS des oeuvres, elles-mêmes ordonnée chronologiquement
+# Nous voulons ordonner les LIGNES du tableau en fonction de l'année de publication des oeuvres.
 
 ouvrages[order(ouvrages$annee.publication),]
 
-# Si cette présentation est conforme à ce que vous souhaitez, vous l'assignez à l'objet et écrasez la version antérieure, ou encore créez un nouvel objet sans écraser cette autre version non ordonnée.
+# Si cette présentation est conforme à ce que vous souhaitez obtenir, vous l'assignez à l'objet et écrasez la version antérieure.
 
 ouvrages_chronologie <- ouvrages[order(ouvrages$annee.publication),]
 
@@ -158,7 +141,7 @@ ouvrages_chronologie <- ouvrages[order(ouvrages$annee.publication),]
 
 Vous avez maintenant deux objets similaires, mais non identiques. Préserver différents états d'un même objet peut être utile dans certaines situations.
 
-Nous allons enregistrer une copie du premier objet; il nous servira dans le prochain atelier. Pour un tableau de données, il est d'usage de l'enregistrer en format .RDS, qui est le format spécifique aux objets de R, soit en format .csv, si votre intention est par exemple de partager le tableau ou de l'utiliser dans d'autres logiciels.
+Nous allons enregistrer une copie du premier objet; il nous servira dans le prochain atelier. Pour un tableau de données, il est d'usage de l'enregistrer soit en format .RDS, qui est le format spécifique aux objets de R, soit en format .csv, si votre intention est par exemple de partager le tableau ou de l'utiliser dans d'autres logiciels.
 
 ```{r}
 
