@@ -1,3 +1,0 @@
-"0",""
-"0","# C'est donc ce vecteur qu'on donnera à la fonction `grep()`, elle-même insérée en position `j` des crochets. "
-"0","rc[grep(pattern = ""femme"", rc$TITRE_FRANÇAIS), grep(""TITRE"", colnames(rc))]"

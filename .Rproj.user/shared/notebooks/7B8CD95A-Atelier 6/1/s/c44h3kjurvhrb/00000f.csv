@@ -1,1 +1,0 @@
-"0","rownames(publications) <- paste(1:nrow(publications), letters, sep = ""-"")"

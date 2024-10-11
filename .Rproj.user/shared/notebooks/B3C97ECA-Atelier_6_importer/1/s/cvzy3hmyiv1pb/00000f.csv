@@ -1,3 +1,0 @@
-"0","library(epubr)"
-"0","chemin_relatif3 <- ""donnees/scouine.epub"""
-"0","scouine <- epubr::epub(file = chemin_relatif3)"

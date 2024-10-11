@@ -7,7 +7,7 @@ editor: visual
 
 [![Crédit photographique, Wendell Shinn, Unsplash](images/wendell-shinn-xsAj4IwTYik-unsplash.jpg){fig-align="center"}](https://unsplash.com/photos/xsAj4IwTYik)
 
-Dans un monde idéal, les données que vous souhaiterez analyser existeront déjà sous forme de table ou, tout au moins, seront déjà stockées dans un fichier. On a vu dans l'Atelier 5 la manière d'importer de telles données. Malheureusement, vous n'aurez pas toujours la tâche aussi facile et il vous faudra peut-être procéder vous-même au moissonnage des données que vous souhaitez analyser. Vous pourriez par exemple vouloir analyser le contenu de sites de journaux ou des blogues de politiciens ou d'écrivains. Vous devrez donc mettre en oeuvre une stratégie de récupération des données contenues dans ces sites et verser les textes et les métadonnées (nom de l'auteur, jour et heure de la publication, etc.) dans des tableaux de données. La récupération de ces données sera facilitée par les balises HTML dont la fonction est de structurer le contenu des pages web. Par défaut, vous ne voyez pas ces balises: votre navigateur les interprète et ne renvoit que le résultat de cette lecture. Il faut utiliser les outils avancés de votre navigateur pour y avoir accès, ou encore recourir à des plugiciels.
+Dans un monde idéal, les données que vous souhaiterez analyser existeront déjà sous forme de table ou, tout au moins, seront déjà stockées dans un fichier et disponible en ligne (par exemple sur le site Projet Gutenberg). On a vu dans l'Atelier 5 la manière d'importer de telles données. Malheureusement, vous n'aurez pas toujours la tâche aussi facile et il vous faudra peut-être procéder vous-même au moissonnage des données que vous souhaitez analyser. Vous pourriez par exemple vouloir analyser le contenu de sites de journaux ou des blogues de politiciens ou d'écrivains. Vous devrez donc mettre en œuvre une stratégie de récupération des données contenues dans ces sites et verser les textes et les métadonnées (nom de l'auteur, jour et heure de la publication, etc.) dans des tableaux de données. La récupération de ces éléments textuels sera facilitée par les balises HTML dont la fonction est de structurer le contenu des pages web. Par défaut, lorsque vous visitez un site, vous ne voyez pas ces balises: votre navigateur les interprète et ne renvoit que le résultat de cette interprétation. Il faut utiliser les outils avancés de votre navigateur pour y avoir accès, ou encore recourir à des plugiciels.
 
 ## Les extensions `polite` et `rvest`
 
@@ -22,17 +22,17 @@ library(polite)
 
 ```
 
-L'extension `polite` offre des fonctions qui permettent à l'utilisateur de R de savoir si les sites visés par le moissonnage permettent cette pratique et, le cas échéant, de le faire dans les règles de l'art. Vous pourrez consulter sur [CRAN](https://cran.r-project.org/web/packages/polite/index.html) la documentation ainsi que la [vignette](https://github.com/dmi3kno/polite) créée par Dmytro Perepolkin, l'auteur de l'extension. La fonction centrale de `polite` est `bow()`, qui à la fois indique à R l'url du site à moissonner, vérifie que le site en question permet cette opération et fournit à ce dernier votre identité. La fonction `scrape()` extraira le code HTML de la page et permettra, avec d'autres fonctions, d'isoler des éléments en particulier.
+L'extension `polite` offre des fonctions qui permettent à l'utilisateur de R de savoir si les sites visés par le moissonnage permettent cette pratique et, le cas échéant, de le faire dans les règles de l'art. Vous pourrez consulter sur [CRAN](https://cran.r-project.org/web/packages/polite/index.html) la documentation ainsi que la [vignette](https://github.com/dmi3kno/polite) créée par Dmytro Perepolkin, l'auteur de l'extension. La fonction centrale de `polite` est `bow()`, qui à la fois indique à R l'adresse URL du site à moissonner, vérifie que le site en question permette cette opération et fournit à ce dernier votre identité. La fonction `scrape()` extraira le code HTML de la page et permettra, avec d'autres fonctions, d'isoler des éléments en particulier.
 
 L'extention `rvest`, comme son nom le laisse entendre, offre une multitude de fonctions de moissonnage de sites. La fonction `read.html()`, équivalente de la fonction `scrape()` de `polite`, permet d'extraire le code HTML d'une page; l'objet renvoyé est de type `xml`. Cet objet doit ensuite être transféré à des fonctions permettant l'extraction d'éléments ciblés.
 
-Il y a deux principales manières d'extraire des éléments d'une page HTML: soit on utilise le chemin vers cet élément à l'aide d'un `xpath`\`, soit on utilise les balises CSS (pour *Cascading Style Sheet*). Dans le premier cas, on recourt à la structure de la page; dans le second, on utilise les balises qui définissent le style des éléments des pages HTML.
+Il y a deux principales manières d'extraire des éléments d'une page HTML: soit on utilise le chemin vers cet élément à l'aide d'un `xpath`, soit on utilise les balises CSS (pour *Cascading Style Sheet*). Dans le premier cas, on recourt à la structure de la page; dans le second, on utilise les balises qui définissent le style des éléments des pages HTML.
 
 Le repérage des `xpaths` ou des balises CSS peut se faire manuellement, quand on lit bien le code HTML, mais on peut aussi recourir à un plugiciel (plusieurs sont offerts gratuitement). Les auteurs de l'extension `rvest` recommandent le plugiciel [SelectorGadget](https://rvest.tidyverse.org/articles/selectorgadget.html) pour identifier les balises CSS. On utilisera ci-dessous le plugiciel [XpathFinder](https://chrome.google.com/webstore/detail/xpath-finder/ihnknokegkbpmofmafnkoadfjkhlogph), qu'on peut ajouter à Chrome.
 
-Dans le premier exemple ci-dessous, on moissonnera une page Wikipedia fournissant des informations sur les [Premiers ministres du Québec](https://fr.wikipedia.org/wiki/Premier_ministre_du_Qu%C3%A9bec). Plus précisément, on extraiera la table contenue dans cette page qui fournit les noms de tous les Premiers ministres de l'histoire du Québec et plusieurs autres informations les concernant. Une fois que vous aurez installé le plugiciel XpathFinder, vous pourrez vous rendre sur la page à moissonner, activer le plugiciel et sélectionner une partie du tableau. Vous copierez le chemin qui vous sera indiqué dans la partie inférieure gauche de votre navigateur, du début jusqu'à la balise `tbody` (pour "table body"):
+Dans le premier exemple ci-dessous, on moissonnera une page Wikipedia fournissant des informations sur les [Premiers ministres du Québec](https://fr.wikipedia.org/wiki/Premier_ministre_du_Qu%C3%A9bec). Plus précisément, on extraiera la table contenue dans cette page qui fournit les noms de tous les Premiers ministres de l'histoire du Québec et plusieurs autres informations les concernant. Une fois que vous aurez installé le plugiciel XpathFinder, vous pourrez vous rendre sur la page à moissonner, activer le plugiciel et sélectionner une partie du tableau. Vous copierez le chemin qui vous sera renvoyé dans la partie inférieure gauche de votre navigateur, du début jusqu'à la balise `tbody` (pour "table body"):
 
-`/html/body/div[1]/div/div[4]/main/div/div[2]/div[1]/table[2]/tbody`.
+`/html/body/div[2]/div/div[3]/main/div[3]/div[3]/div[1]/table[2]`.
 
 ![](images/Capture%20d%E2%80%99e%CC%81cran,%20le%202022-09-12%20a%CC%80%2020.54.16.png){fig-align="center"}
 
@@ -41,11 +41,15 @@ Dans le premier exemple ci-dessous, on moissonnera une page Wikipedia fournissan
 session <- bow("https://fr.wikipedia.org/wiki/Premier_ministre_du_Qu%C3%A9bec",
                user_agent = "Pascal Brissette, U. McGill, pascal.brissette@mcgill.ca")
 
+# print(session)
+
 # On lit la page, on indique l'élément d'intérêt de cette page, et on l'extrait
 lecture_page <- scrape(session)
 
+print(lecture_page)
+
 # On extrait l'élément d'intérêt dans la page
-extraction_element <-   html_element(lecture_page, xpath = "/html/body/div[1]/div/div[4]/main/div/div[2]/div[1]/table[2]/tbody")
+extraction_element <-   html_element(lecture_page, xpath = "/html/body/div[2]/div/div[3]/main/div[3]/div[3]/div[1]/table[2]")
 
 # Lecture de la table
 tableau_prem_min <- html_table(extraction_element)
@@ -58,7 +62,7 @@ tableau_prem_min$Nom
 
 ```
 
-Supposons maintenant que vous souhaitiez extraire non pas le tableau de données de la page, mais le texte de l'article en tant que tel. Vous tenterez d'isoler les paragraphes des autres éléments de la page à l'aide d'un plugiciel, mais cela pourrait être ardu. J'ai moi-même essayé de le faire et le plugiciel est incapable de sélectionner le corps du texte seulement. Il faut se résoudre à sélectionner soit l'ensemble de la page, ce qui produira beaucoup de "bruit" dans le résultat, soit un paragraphe en particulier. Extrayons le premier de ces paragraphes.
+Supposons maintenant que vous souhaitiez extraire non pas le tableau de données de la page, mais le texte de l'article en tant que tel. Vous tenterez d'isoler les paragraphes des autres éléments de la page à l'aide d'un plugiciel, mais cela pourrait être ardu, voire impossible. Il faut se résoudre à sélectionner soit l'ensemble de la page, ce qui produira beaucoup de "bruit" dans le résultat, soit un paragraphe en particulier. Extrayons le premier de ces paragraphes.
 
 ```{r}
 # Se présenter et vérifier l'accessibilité de la page
@@ -69,7 +73,7 @@ session <- bow("https://fr.wikipedia.org/wiki/Premier_ministre_du_Qu%C3%A9bec",
 lecture_page <- scrape(session)
 
 # On extrait l'élément d'intérêt dans la page
-description_par_1 <- html_element(lecture_page, xpath = "/html/body/div[1]/div/div[4]/main/div/div[2]/div[1]/p[2]")
+description_par_1 <- html_element(lecture_page, xpath = "/html/body/div[2]/div/div[3]/main/div[3]/div[3]/div[1]/p[2]")
 
 # Lecture du texte compris entre les balises
 description_text_par_1 <- html_text2(description_par_1)
@@ -78,7 +82,7 @@ description_text_par_1
 
 ```
 
-Voudrez-vous répéter cette opération pour chacun des paragraphes de cette page et changer vous-même, pour chaque paragraphe, le chiffre contenu dans le crochet à la fin du `xpath`? Ce ne serait pas particulièrement efficace! Il existe en programmation, on le verra ultérieurement, des structures de contrôle permettant de lancer l'exécution automatique d'instructions un nombre de fois déterminé. Dans les instructions ci-dessous, on utilisera une boucle, la boucle `while`, qui indique à R qu'il doit répéter une instruction jusqu'à ce qu'il remplisse une condition. En inspectant votre page, vous verrez que la balise qui termine le `xpath` varie de 2 à 12. Nous allons donc créer une liste contenant 11 espaces réservés dans lesquels une boucle, à chaque itération de l'instruction, viendra placer le contenu d'un paragraphe en particulier. L'opération peut sembler complexe, mais elle est assez simple et nous aurons l'occasion d'y revenir plus en détail.
+Voudrez-vous répéter cette opération pour chacun des paragraphes de cette page et changer vous-même, pour chaque paragraphe, le chiffre contenu dans le crochet à la fin du `xpath`? Ce ne serait pas particulièrement efficace! Il existe en programmation, on le verra ultérieurement, des structures de contrôle permettant de lancer l'exécution automatique d'instructions un nombre de fois déterminé. Dans les instructions ci-dessous, on utilisera une boucle, la boucle `while`, qui indique à R qu'il doit répéter une instruction jusqu'à ce que qu'une certaine condition soit remplie. En inspectant votre page, vous verrez que la balise qui termine le `xpath` varie de 2 à 12. Nous allons donc créer une liste contenant 11 espaces réservés dans lesquels une boucle, à chaque itération de l'instruction, viendra placer le contenu d'un paragraphe en particulier. L'opération peut sembler complexe, mais elle est assez simple et nous aurons l'occasion d'y revenir plus en détail.
 
 ```{r}
 
@@ -97,7 +101,7 @@ i = 2
 
 # On crée la boucle
 while(i < 13) {
-  description[[i-1]] <- html_element(lecture_page, xpath = paste0("/html/body/div[1]/div/div[4]/main/div/div[2]/div[1]/p[", i, "]")) |> html_text2()
+  description[[i-1]] <- html_element(lecture_page, xpath = paste0("/html/body/div[2]/div/div[3]/main/div[3]/div[3]/div[1]/p[", i, "]")) |> html_text2()
   i = i+1
 }
 

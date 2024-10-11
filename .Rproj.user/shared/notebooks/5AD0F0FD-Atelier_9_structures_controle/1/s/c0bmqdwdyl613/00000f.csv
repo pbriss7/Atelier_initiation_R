@@ -1,7 +1,0 @@
-"0","if(1953L %in% auteures_quebecoises$annee) {print(""Oui, le tableau comporte bien une oeuvre publiée en 1953."")} # VRAI"
-"1","[1]"
-"1"," ""Oui, le tableau comporte bien une oeuvre publiée en 1953."""
-"1","
-"
-"0","if(""Kamouraska"" %in% auteures_quebecoises$oeuvre) {print(""Oui, Kamouraska fait bien partie des oeuvres du tableau."")} # FAUX"
-"0",""

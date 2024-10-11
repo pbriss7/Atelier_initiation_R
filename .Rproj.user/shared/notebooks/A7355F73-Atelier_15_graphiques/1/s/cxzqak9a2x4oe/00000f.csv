@@ -1,8 +1,0 @@
-"0","# On crée une première couche contenant les données et leur projection en composantes esthétiques."
-"0","p <- ggplot(pretendants_freq_brute, aes(x=nom, y=freq_brute))"
-"0",""
-"0","# On ajoute à cette première couche (avec l'opérateur + ) les formes géométriques"
-"0","p2 <- p + geom_bar(stat = ""identity"")"
-"0",""
-"0","p2"
-"0",""

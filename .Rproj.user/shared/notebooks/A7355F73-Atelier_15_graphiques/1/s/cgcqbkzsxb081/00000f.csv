@@ -1,8 +1,0 @@
-"0",""
-"0","# La première couche constituée des données et des éléments esthétiques, sera la même pour les deux types de diagrammes"
-"0","p <- ggplot(pretendants_freq_rel_chap, aes(x=chapitre, y=freq_rel, fill=nom))"
-"0",""
-"0","# Option 1: le diagramme utilise les couleurs pour indiquer la distribution des valeurs selon la variable `nom`."
-"0","p + geom_bar(stat = ""identity"", position = ""stack"")+"
-"0","  xlab(""Chapitre"")+"
-"0","  ylab(""Fréquence relative"")"

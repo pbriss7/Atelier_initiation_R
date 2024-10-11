@@ -1,3 +1,0 @@
-"0","p <- ggplot(pretendants_freq_rel_chap, aes(x=chapitre, y=freq_rel, shape = nom, colour=nom))"
-"0",""
-"0","p + geom_point()"

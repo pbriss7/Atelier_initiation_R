@@ -1,1 +1,0 @@
-"0","if(!""rvest"" %in% rownames(installed.packages())) {install.packages(""rvest"")}"

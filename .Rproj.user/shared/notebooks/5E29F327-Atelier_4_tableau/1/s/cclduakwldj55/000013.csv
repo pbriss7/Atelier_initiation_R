@@ -1,7 +1,0 @@
-"0",""
-"0","# Si vous êtes satisfait.e.s de ce résultat, vous pouvez l'assigner à l'objet "
-"0","# et ""écraser"" la version antérieure par la nouvelle."
-"0",""
-"0","ouvrages <- ouvrages[, c(""auteur"", ""est.femme"", ""oeuvre"", ""date"", ""genre"")]"
-"0",""
-"0","ouvrages"

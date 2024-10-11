@@ -8,7 +8,7 @@ editor: visual
 
 Les graphiques sont l'un des plus puissants leviers d'explication des données. Il n'y a guère de meilleur moyen de parler des données et de les faire "parler" que de les donner à voir. L'utilisation des graphiques ne date pas d'hier. On peut admirer ci-dessous celui produit en 1869 par l'ingénieur Charles Joseph Mignard. Celui-ci illustre les pertes colossales subies par la Grande Armée (450 000 hommes) de Napoléon au cours de la Campagne de Russie. L'épaisseur du trait indique la quantité d'hommes, la couleur, la direction de la marche. Bien que fondé sur de solides statistiques, ce graphique donne à voir un phénomène qui ne requiert aucune connaissance des statistiques. En quelques traits, il synthétise toute une histoire.
 
-[![Charles Joseph Minard, "Carte figurative des pertes successives en hommes de l\'armée française dans la campagne de Russie 1812-1813", 1869](images/minard_campagne_russie.png){fig-align="center"}](https://fr.wikipedia.org/wiki/Charles_Joseph_Minard)
+[![Charles Joseph Minard, "Carte figurative des pertes successives en hommes de l'armée française dans la campagne de Russie 1812-1813", 1869](images/minard_campagne_russie.png){fig-align="center"}](https://fr.wikipedia.org/wiki/Charles_Joseph_Minard)
 
 ## Programme de l'atelier
 
@@ -16,9 +16,31 @@ Dans le présent atelier, vous aurez l'occasion de vous initier à la grammaire 
 
 ## Les facteurs
 
-Dans R, les facteurs servent à emmagasiner des variables catégoriques, c'est-à-dire des variables dont les modalités forment un ensemble fini et dénombrable. Ce type de données est utile pour, par exemple, ordonner des valeurs nominales d'une manière qui nous convienne. Prenons un exemple simple. Si je demande à R d'ordonner les douze mois du calendrier grégorien, il ne comprendra pas ce que je veux: il prendra les chaînes de caractères que je lui donne et ordonnera la série par ordre alphabétique, en prenant la première lettre du mois comme point de comparaison. Voyons ce que cela donne:
+Pour expliquer ce qu'est un facteur ou une donnée catégorielle, rien de mieux que d'utiliser un exemple simple. Soit le tableau de données suivant, indiquant de manière aléatoire les profits mensuel de vente de vêtements d'occasion.
 
 ```{r}
+
+calendrier_profit_df <- data.frame(mois = sample(month.name, size = 50, replace = T),
+                            profit = round(sample(1:500, size = 50, replace = T)))
+
+head(calendrier_profit_df)
+
+```
+
+Le tableau comporte 50 lignes, mais même s'il en avait 5000, il n'y aurait jamais d'autre modalité dans la première colonne que ceux du calendrier grégorien. À moins que la personne ayant entré les données ait fait des erreurs dans l'orthographe des noms de mois, bien sûr, mais on y reviendra plus ci-dessous. Le fait est que si le vendeur a bien fait son travail, le nombre maximal de modalités dans la première colonne est de 12. On peut en observer la distribution comme suit:
+
+```{r}
+
+table(calendrier_profit_df$mois)
+
+```
+
+Le vecteur de type `character`, quand il comporte un nombre **fini** et **limité** de modalités, gagne souvent à être converti en objet **`factor`**. Les objets `factors` ne sont pas stockés en mémoire comme des chaînes de caractères, mais comme des nombres correspondant aux niveaux distincts. Cela réduit donc de manière importante la taille du vecteur en mémoire et améliore les performances des analyses statistiques. De plus, les modalités distinctes d'un objet factor peuvent être ordonnés, ce qui est très utile lorsque, dans un graphique, on souhaite présenter les données d'une manière très précise.
+
+Prenons à nouveau l'exemple des mois du calendrier. Si je demande à R d'ordonner les douze mois du calendrier, il ne comprendra pas ce que je veux: il prendra les chaînes de caractères que je lui donne et ordonnera la série par ordre alphabétique, en prenant la première lettre du mois comme point de comparaison. Voyons ce que cela donne:
+
+```{r}
+
 mois_c <- c("février", "janvier", "novembre","mars", "octobre", "avril", "mai", "juin",
             "juillet", "août","septembre","août", "mars", "février", "décembre", "juin")
 
@@ -26,18 +48,18 @@ sort(mois_c)
 
 ```
 
-Les mois d'août et d'avril arrivent en tête de vecteur, suivis par décembre. C'est ici que la fonction `factor()`, qui transforme une donnée en donnée catégorique, peut être utile. Avec l'argument `levels =`, nous pourrons imposer un ordre. Et comme les mois sont en nombre finis, on ne risque pas de croiser dans nos données des modalités autres que les douze que nous allons définir.
+Lorsque je demande à ordonner ce vecteur, R place les mois d'août et d'avril en tête de vecteur, suivis par décembre. C'est ici que la fonction `factor()`, qui transforme une donnée en donnée catégorielle, peut être utile. Avec l'argument `levels =`, nous pourrons imposer un ordre. Et comme les mois sont en nombre finis, on ne risque pas de croiser dans nos données des modalités autres que les douze que nous allons définir.
 
 ```{r}
+
 # On peut créer un vecteur qui indiquera à la fonction `factor()` quel ordre je souhaite donner à mes données catégoriques (argument `levels=`)
-ordre_mois <- c("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août",
-                  "septembre", "octobre", "novembre", "décembre")
+ordre_mois <- c("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre")
 
 # On transforme ainsi le vecteur mois_c, de type `character`, en vecteur catégorique (facteur)
 mois_f <- factor(x = mois_c,
        levels = ordre_mois)
 
-# On peut vérifier le type de données
+# On peut vérifier le type de l'objet
 class(mois_f)
 
 # On peut trier les valeurs selon l'ordre fourni à l'argument `levels=`
@@ -45,19 +67,19 @@ sort(mois_f)
 
 # Ou selon l'ordre inversé
 sort(mois_f, decreasing = TRUE)
+
 ```
 
-Un autre intérêt des facteurs est qu'ils peuvent aider à repérer d'eventuelles erreurs typographiques dans les valeurs. Supposons qu'il y ait une telle erreur dans mon vecteur initial. Je vais ordonner ce vecteur de charactères selon un ordre défini dans l'argument `levels=` de la fonction `factor()`, comme je l'ai fait ci-dessus. Voyez le résultat lorsque j'appelle le vecteur catégorique:
+Un autre intérêt des facteurs est qu'ils peuvent aider à repérer d'eventuelles erreurs typographiques dans les modalités. Supposons qu'il y ait une telle erreur dans mon vecteur initial. Je vais ordonner ce vecteur de charactères selon un ordre défini dans l'argument `levels=` de la fonction `factor()`, comme je l'ai fait ci-dessus. Voyez le résultat lorsque j'appelle le vecteur catégorique:
 
 ```{r}
+
 # Création d'un vecteur comprenant 16 éléments (répétition de certains noms de mois, dont l'un mal orthographié)
 mois_c <- c("février", "janvier", "movembre","mars", "octobre", "avril", "mai", "juin",
             "juillet", "août","septembre","août", "mars", "février", "décembre", "juin")
 
 # Le vecteur de caractères est transformé en facteur. L'ordre des mois est précisé avec levels=
-mois_f <- factor(x = mois_c,
-       levels = c("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août",
-                  "septembre", "octobre", "novembre", "décembre"))
+mois_f <- factor(x = mois_c,levels = c("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août","septembre", "octobre", "novembre", "décembre"))
 
 mois_f
 
@@ -68,7 +90,9 @@ Le mois qui a été mal orthographié dans le vecteur des valeurs ne correspond 
 Si vous demandez à R de vous fournir la structure du vecteur catégorique, vous verrez une série de chiffres qui pourrait attirer votre attention:
 
 ```{r}
+
 str(mois_f)
+
 ```
 
 La fonction `str()` confirme d'abord que le vecteur est de type catégorique (`factor`) et qu'il comporte 12 catégories (`levels`). Les deux premiers niveaux vous sont indiqués ("janvier", "février"), puis suit un vecteur numérique. À quoi cela correspond-il?
@@ -76,6 +100,7 @@ La fonction `str()` confirme d'abord que le vecteur est de type catégorique (`f
 C'est une particularité de la variable catégorique de se présenter sous la forme de caractères, mais d'être emmagasinée dans R comme une suite de nombres entiers. La variable catégorique est une variable discrète et comme il n'y a pas d'intervalle entre les catégories, R peut associer à chacune, selon l'ordre que l'on a indiqué dans `levels=`, un nombre entier positif. De sorte que si on demande à R à quoi correspondent les données de notre vecteur avec `typeof()`, il nous dira qu'il s'agit d'*integer*:
 
 ```{r}
+
 class(mois_f) # la structure est de type factor
 typeof(mois_f) # les données elles-mêmes sont de type numérique (integer)
 
@@ -97,7 +122,7 @@ Dans la grammaire des graphiques, une couche est composée des éléments suivan
 
 Le graphique est le résultat de la superposition de ces couches. Certaines sont facultatives ou sont pourvues de valeurs par défaut, d'autres sont nécessaires et doivent être précisées par l'utilisateur:
 
-[![Capture de l'antisèche ggplot2, RStudio](images/ggplot_min.jpg){fig-align="center"}](https://www.rstudio.com/resources/cheatsheets/)
+[![Capture de l\'antisèche ggplot2, RStudio](images/ggplot_min.jpg){fig-align="center"}](https://www.rstudio.com/resources/cheatsheets/)
 
 +---------------------------+-------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Élément                   | Fonction                                        | Explications                                                                                                                                                                                                                                                                                        |
