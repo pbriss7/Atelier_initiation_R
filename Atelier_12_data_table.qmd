@@ -8,41 +8,57 @@ editor: visual
 
 [![Logo, data.table](images/logo.png){fig-align="center"}](https://rdatatable.gitlab.io/data.table/)
 
-Cet atelier est consacré à l'extension `data.table`, qui permet de créer des tableaux de données comme ceux que vous avez vus et manipulés jusqu'ici. Toutes les opérations que vous avez faites avec des tableaux de données jusqu'ici peuvent être faites avec un tableau de type `data.table`. Cependant, vos manipulations peuvent être simplifiées et certaines opérations fréquentes peuvent être faites avec des gains de performance significatifs. Cet atelier offre une introcuction à l'extension et à l'objet `data.table`. N'hésitez pas à consulter les vignettes pour approfondir vos connaissances.
+Cet atelier est consacré à l'extension `data.table`, qui permet de créer des tableaux de données. Un tableau de type `data table` possède les propriétés d'un tableau de base de type `data frame`. À peu près tout ce qu'on peut faire avec un `data frame` peut être fait avec une `data table`. Avec cette dernière, cependant, les manipulations peuvent être simplifiées et certaines opérations fréquentes peuvent être faites avec des gains de performance très significatifs. Cet atelier offre une introcuction à l'extension et à l'objet `data.table`. N'hésitez pas à consulter les vignettes pour approfondir vos connaissances.
 
-Commençons par importer un tableau de données conséquent, celui, par exemple, des crimes commis sur le territoire montréalais. Au lieu d'utiliser la fonction `read.csv()`, comme dans les ateliers précédents, nous allons utiliser la fonction `fread()` de l'extension `data.table`. Nous allons en profiter pour comparer la vitesse des deux fonctions.
+Commençons par importer un tableau de données conséquent, celui, par exemple, des crimes commis sur le territoire montréalais. Au lieu d'utiliser la fonction `read.csv()`, comme dans les ateliers précédents, nous allons utiliser la fonction `fread()` de l'extension `data.table` (`fread()` comme dans *fast read*). Nous allons en profiter pour comparer la vitesse des deux fonctions.
 
 ```{r}
-if(!"rbenchmark" %in% rownames(installed.packages())) {install.packages("rbenchmark")}
-if(!"data.table" %in% rownames(installed.packages())) {install.packages("data.table")}
+inst_pack_f <- function(x) {
+  if(!x %in% rownames(installed.packages())) {
+    install.packages(x)
+    }
+  require(x, character.only = TRUE)
+}
+
+extensions_v <- c("rbenchmark",
+                  "data.table",
+                  "pryr",
+                  "ggplot2"
+                  )
+
+lapply(extensions_v, inst_pack_f)
 
 library(rbenchmark)
 library(data.table)
+library(pryr)
+library(ggplot2)
 
-# Si vous souhaitez comparer la vitesse d'exécution des deux fonctions, supprimez les croisillons, exécutex les instructions et soyez patients: Les fonctions seront exécutées 100 fois chacune, puis comparées.
+# Si vous souhaitez comparer la vitesse d'exécution des deux fonctions, supprimez les croisillons, exécutez les instructions et soyez patients: Les fonctions seront exécutées 100 fois chacune, puis les temps d'exécution seront renvoyées.
 
 # rbenchmark::benchmark(
 #   data.table = crimes_dt <- fread("donnees/actes_criminels.csv"),
 #   base = crimes_df <- read.csv("donnees/actes_criminels.csv")
 # )
 
+# Le rapport indique que fread() a été plus de douze fois plus rapide en moyenne.
+
+# On peut comparer les structures des deux objets
 crimes_df <- read.csv("donnees/actes_criminels.csv")
 crimes_dt <- fread("donnees/actes_criminels.csv")
 str(crimes_df)
 str(crimes_dt)
+
 ```
 
-La fonction `fread()` n'est pas seulement deux fois plus rapide que les fonctions de lecture de base de R, elle est également plus simple d'utilisation. Elle examine la structure et détermine si les éléments séparateurs sont des virgules, des points-virgules ou des tabulations. Vous n'avez donc pas à le préciser dans les arguments, ou à utiliser l'une des déclinaisons de `read.table()` (`read.csv()`, `read.csv2()`, `read.tsv()`). Cela est d'autant plus pratique qu'en règle générale, vous n'avez pas encore inspecté la table que vous importez et ne savez pas quel en est l'élément séparateur. La fonction `fread()` tente également de trouver le type de données de chaque colonne et attribuera automatiquement des types aux données. Les fonctions de base cherchent également à faire ce repérage automatique, mais avec moins de succès. Dans l'importation de notre table, ci-dessus, read.csv() n'a pas reconnu le format "IDate" de la colonne `DATE`, ce qu'est arrivée à faire `fread()`.
+La fonction `fread()` n'est pas seulement douze fois plus rapide que les fonctions de lecture de base de R, elle est également plus simple d'utilisation. Elle examine la structure et détermine si les éléments séparateurs sont des virgules, des points-virgules ou des tabulations. Vous n'avez donc pas à le préciser dans les arguments, ni à utiliser l'une des déclinaisons de `read.table()` (`read.csv()`, `read.csv2()`, `read.tsv()`). Cela est d'autant plus pratique qu'en règle générale, vous n'avez pas encore inspecté la table que vous importez et ne savez pas quel en est l'élément séparateur. La fonction `fread()` tente également de trouver le type de données de chaque colonne et attribuera automatiquement des types aux données. Les fonctions de base cherchent également à faire ce repérage automatique, mais avec moins de succès. Dans l'importation de notre table, ci-dessus, `read.csv()` n'a pas reconnu le format "IDate" de la colonne `DATE`. `fread()` a reconnu le type de données et a formaté les valeurs en conséquence.
 
-Appelons dorénavant "table de données" les tableaux créés avec `data.table`, simplement pour les distinguer des tableaux de données de base (`data.frame`).
-
-### Indiçage de lignes avec `data.table`
+### Indexation des lignes avec `data.table`
 
 Dans un objet en deux dimensions comme un tableau de données de type `data.frame`, on doit normalement insérer une virgule entre les arguments `i` et `j`:
 
 `[ i , j ]`
 
-Même si vous n'indiquez rien après la virgule (parce que vous souhaitez extraire toutes les colonnes), vous devrez l'insérer. Avec une table, le filtrage des lignes ne requiert pas de virgule:
+Même si vous n'indiquez rien après la virgule (parce que vous souhaitez extraire toutes les colonnes), vous devrez insérer la virgule. Avec une table de données, vous pouvez l'omettre:
 
 ```{r}
 crimes_df[1 , ] # filtrage de la première ligne du tableau
@@ -60,7 +76,7 @@ On a vu déjà que, dans un tableau, on pouvait indiquer une condition en positi
 # head(crimes_dt[QUART == "jour"])
 ```
 
-Les opérateurs que peut accepter la table en position i sont également plus nombreux. Outre les opérateurs logiques et de calculs qu'accepte également le tableau de données:
+Les opérateurs que peut accepter la table en position `i` sont également plus nombreux. Outre les opérateurs logiques et de calculs qu'accepte également le tableau de données:
 
 -   `>`
 
@@ -82,24 +98,27 @@ Les opérateurs que peut accepter la table en position i sont également plus no
 
 -   `&`
 
-La table accepte l'intéressant opérateur
+La table accepte les très utiles opérateurs
 
 -   `%like%`
+-   `%ilike%`
 
-Celui-ci permet d'effectuer des recherches dans des chaînes de caractères en utilisant des expressions régulières. Vous n'avez donc plus à utiliser des fonctions auxquelles vous passez l'objet et un argument de type `pattern=`:
+Ceux-ci permettent d'effectuer des recherches dans des chaînes de caractères en utilisant des expressions régulières simples. Vous n'avez généralement plus à utiliser des fonctions auxquelles vous passez l'objet et un argument de type `pattern=`:
 
 ```{r}
 # Les deux instructions ci-dessous produisent le même résultat
 
 # crimes_df[str_detect(crimes_df$CATEGORIE, pattern = "moteur"),]
 # 
-# crimes_dt[CATEGORIE %like% "moteur"]
+# crimes_dt[CATEGORIE %ilike% "moteur"]
 ```
 
-Un autre opérateur pratique accepté par la table est %between%, qui filtre un tableau en tenant compte d'un intervale entre deux valeurs fournies comme vecteur.
+La différence entre `%like%` et `%ilike%` tient simplement à la casse. Dans le premier cas, la casse est prise en compte, mais non dans le second.
+
+Un autre opérateur pratique accepté par la table est `%between%`, qui filtre un tableau en tenant compte d'un intervale entre deux valeurs fournies comme vecteur.
 
 ```{r}
-# Les deux instructions ci-dessous produisent le même résultat
+# Les deux instructions ci-dessous produisent le même résultat.
 
 # crimes_df[as.Date(crimes_df$DATE) >= "2017-01-01" & as.Date(crimes_df$DATE) <= "2017-06-01", ]
 # 
@@ -112,28 +131,26 @@ On peut aussi utiliser plusieurs filtres, liés par l'opérateur `&`:
 # crimes_dt[DATE %between% c("2017-01-01", "2018-01-01") & CATEGORIE %ilike% "infractions"]
 ```
 
-Dans l'instruction ci-dessus, on a utilisé `%ilike%` plutôt que `%like%`. Le premier opérateur n'est pas sensible à la casse et "attrapera" aussi bien "Infractions" que "infractions".
-
 ### Le regroupement d'éléments
 
-Là où data.table se distingue davantage des structures concurrentes est dans l'ajout d'un troisième argument dans les crochets d'indiçage, l'argument `by=`. Voici comment se présente la syntaxe de data.table:
+Là où data.table se distingue davantage des structures concurrentes est dans l'ajout d'un troisième argument dans les crochets d'indexation, l'argument `by=`. Voici comment se présente la syntaxe de `data.table`:
 
-[![Syntaxe de data.table,](images/data_table_syntax.png){fig-align="center"}](https://www.machinelearningplus.com/data-manipulation/datatable-in-r-complete-guide/)
+[![Syntaxe de data.table](images/data_table_syntax.png){fig-align="center"}](https://www.machinelearningplus.com/data-manipulation/datatable-in-r-complete-guide/)
 
-Que fait l'argument `by=`? Il indique à l'interpréteur la colonne qui doit servir à regrouper vos données. Si par exemple vous indiquez la colonne CATEGORIE comme facteur de regroupement, toutes vos données seront présentées selon les modalités de cette variable.
+Que fait l'argument `by=`? Il indique à l'interpréteur la colonne qui doit servir à regrouper vos données, si, bien sûr, vous souhaitez les regrouper! Regroupons par exemple les données de notre table selon les valeurs de la colonne CATEGORIE.
 
 ```{r}
 # Les deux instructions ci-dessous renvoient le même résultat (attention: la première pourrait faire figer RStudio Cloud, car elle exige beaucoup de mémoire. Vous pouvez exécuter la seconde sans crainte.)
 
-# crimes_df[order(crimes_df$CATEGORIE, decreasing = FALSE),]
+# crimes_df[order(crimes_df$CATEGORIE, decreasing = FALSE), c("CATEGORIE", "DATE", "QUART")]
 
 # crimes_dt[, .(DATE, QUART), by=CATEGORIE]
 
 ```
 
-### Indiçage de colonnes avec `data.table`
+### Indexation de colonnes avec `data.table`
 
-Les `data.table`, comme les `data.frame`, offrent la possibilité de sélectionner des colonnes sur la base d'indices numériques insérés en position `j`, à l'intérieur de crochets, ou sur la base de noms de variables placés entre guillemets. Par exemple, si on souhaite obtenir la valeur `ij` correspondant à la première observation de la deuxième colonne, on écrira indifféremment:
+Les tables de données, comme les tableaux, offrent la possibilité de sélectionner des colonnes sur la base d'indices numériques insérés en position `j`, à l'intérieur de crochets, ou sur la base de noms de variables placés entre guillemets. Par exemple, si on souhaite obtenir la valeur `ij` correspondant à la première observation de la deuxième colonne, on écrira indifféremment:
 
 ```{r}
 # Instructions qui produisent le même résultat
@@ -153,19 +170,49 @@ crimes_dt[1, .(CATEGORIE, DATE)]
 
 ### Transformer ou créer de nouvelles colonnes avec data.table et l'opérateur `:=`
 
-Si on souhaitait modifier une colonne existante d'un tableau de données ou en créer une nouvelle, il faudrait procéder par assignation. Par exemple:
+Avec un tableau de données, si on souhaite modifier une colonne existante ou en créer une nouvelle, il faut procéder par assignation. Par exemple:
 
 ```{r}
 # crimes_df$ANNEE <- str_sub(crimes_df$DATE, start = 1, end = 4)
 ```
 
-Une table de données peut être modifiée pour ainsi dire "de l'intérieur", au sein même des crochets d'indiçage:
+Une table de données peut être modifiée pour ainsi dire "de l'intérieur", au sein même des crochets d'indexation:
 
 ```{r}
-# crimes_dt[, ANNEE:=str_sub(DATE, start = 1, end = 4)]
+# crimes_dt[, ANNEE := str_sub(DATE, start = 1, end = 4)]
 ```
 
-La modification d'une colonne existante suit le même principe. Les années extraites dans l'opération ci-dessus sont de type caractères. Transformons ces données en nombres entiers:
+Ce raccourci produit un gain de temps (18 fois plus rapide) :
+
+```{r}
+# rbenchmark::benchmark(
+#   data.table = crimes_dt[, ANNEE := str_sub(DATE, start = 1, end = 4)],
+#   base = crimes_df$ANNEE <- str_sub(crimes_df$DATE, start = 1, end = 4)
+# )
+```
+
+Et un gain de mémoire:
+
+```{r}
+
+# Mesurer la mémoire utilisée par l'opération sur data.table
+mem_data_table <- mem_change({
+  crimes_dt[, ANNEE := str_sub(DATE, start = 1, end = 4)]
+})
+
+# Mesurer la mémoire utilisée par l'opération sur la data.frame de base
+mem_base <- mem_change({
+  crimes_df$ANNEE <- str_sub(crimes_df$DATE, start = 1, end = 4)
+})
+
+# Comparer les résultats
+mem_data_table
+mem_base
+```
+
+En exécutant l'opération *in place*, data.table n'a pas à créer de copie de l'objet et sauve ainsi de la mémoire.
+
+On peut modifier le type de données d'une colonne du tableau d'une manière similaire, avec le même opérateur. Les années extraites dans l'opération ci-dessus sont de type caractères. Transformons ces données en nombres entiers:
 
 ```{r}
 # crimes_dt[, ANNEE:=as.integer(ANNEE)]
@@ -183,11 +230,9 @@ crimes_dt[ , .N, by=QUART]
 
 ```
 
-Ce qui permettra de créer aisément un graphique à barres de ce type (on reviendra sur l'extension ggplot2 dans le prochain atelier):
+Ce qui permettra de créer aisément un graphique à barres de ce type (on reviendra sur l'extension `ggplot2` dans le prochain atelier):
 
 ```{r}
-if(!"ggplot2" %in% rownames(installed.packages())) {install.packages("ggplot2")}
-library(ggplot2)
 
 ggplot(crimes_dt[ , .N, by=CATEGORIE], aes(x=reorder(CATEGORIE, N), y=N))+
   geom_col()+
@@ -200,7 +245,9 @@ ggplot(crimes_dt[ , .N, by=CATEGORIE], aes(x=reorder(CATEGORIE, N), y=N))+
 
 ### Exécuter des opérations sur plusieurs colonnes avec l'opérateur `.SD`
 
-Parfois, on veut accomplir une tâche sur plusieurs colonnes. Le symbole `.SD`, qui provient de *set of data*, permet de préciser les colonnes sur lesquelles on veut accomplir ces tâches. Il est utilisé dans l'argument `j` comme un *substitut* des colonnes dont on précise les noms avec l'argument `.SDcols=`. En guise d'exemple, repérons les valeurs médianes des colonnes `LONGITUDE` et `LATITUDE`. Ces deux colonnes, qui fournissent les coordonnées géographiques des lieux où les méfaits ont été commis, sont formées de valeurs numériques. Nous utiliserons l'argument `na.rm=TRUE` pour indiquer à la fonction `median()` qu'elle ne doit pas tenir compte des valeurs manquantes (`NA`) dans sa tâche.
+Parfois, on veut accomplir une tâche sur plusieurs colonnes. Le symbole `.SD`, qui provient de *set of data*, permet de préciser les colonnes sur lesquelles on veut accomplir ces tâches. Il est utilisé en position `j` comme un *substitut* des colonnes dont on précise les noms avec l'argument `.SDcols=`.
+
+En guise d'exemple, repérons les valeurs médianes des colonnes `LONGITUDE` et `LATITUDE`. Ces deux colonnes, qui fournissent les coordonnées géographiques des lieux où les méfaits ont été commis, sont formées de valeurs numériques. Nous utiliserons l'argument `na.rm=TRUE` pour indiquer à la fonction `median()` qu'elle ne doit pas tenir compte des valeurs manquantes (`NA`) dans sa tâche.
 
 ```{r}
 # Calcul de la valeur médiane de deux colonnes de la table
@@ -214,25 +261,15 @@ crimes_dt[, sapply(.SD, median, na.rm=TRUE), .SDcols= c("LONGITUDE", "LATITUDE")
 
 ### Transformer les objets "par référence"
 
-Jusqu'ici, lorsque nous souhaitions modifier des objets, nous devions utiliser l'opérateur d'assignation \<- et, parfois, écraser une version antérieure d'un objet avec une copie modifiée du même objet. Cela a des inconvénients du point de vue computationnel, car chaque fois qu'une telle opération est faite, une copie profonde de l'objet est inscrite en mémoire. L'extension `data.table` permet de faire des opérations sur les objets sans créer de copies profondes (on parle alors de copies superficielles, [*shallow copy*](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reference-semantics.html)). L'opérateur `:=` introduit ci-dessus procède de la sorte: il crée, modifie ou élimine des colonnes « par référence », à même l'objet, *in situ*:
+Nous avons vu ci-dessus l'intérêt de l'opérateur `:=`, qui permet de créer, de modifier ou de supprimer une colonne d'une table de données avec des gains importants de vitesse et de mémoire. Pour en savoir davantage sur ce processus, on pourra consulter la vignette [Reference semantics (r-project.org)](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reference-semantics.html). Ce type de manipulation des tables n'est pas réservé à l'opérateur `:=`. Une série de fonctions de `data.table` permettent de transformer la structure de la table sans avoir à utiliser l'assignation. Ces fonctions sont toutes précédées du préfixe set:
 
-> "A *shallow* copy is just a copy of the vector of column pointers (corresponding to the columns in a *data.frame* or *data.table*). The actual data is not physically copied in memory.
->
-> A *deep* copy on the other hand copies the entire data to another location in memory.
->
-> With *data.table's* := operator, absolutely no copies are made in *both* (1) and (2), irrespective of R version you are using. This is because := operator updates *data.table* columns *in-place* (by reference)."
->
-> Vignette ["Reference Semantics"](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reference-semantics.html)
-
-Une série de fonctions de `data.table` permettent de transformer la structure de la table sans avoir à utiliser l'assignation. Ces fonctions sont toutes précédées du préfixe set:
-
-| Fonction        | Usage                                                                        | Explication                                                                                                                                                                                    |
-|----------------|----------------|---------------------------------------|
-| `setDT()`       | `setDT(crimes_df)`                                                           | Transforme le tableau de données de base en `data.table`                                                                                                                                       |
-| `setnames()`    | `setnames(crimes_dt, old=c("CATEGORIE", "DATE"), new=c("categorie", "date")` | Modifie les noms de colonnes                                                                                                                                                                   |
-| `setcolorder()` | `setcolorder(crimes_dt, neworder = c("DATE", "CATEGORIE")`                   | Modifie l'ordre de présentation des colonnes.                                                                                                                                                  |
-| `setorder()`    | `setorder(crimes_dt, -DATE)`                                                 | Trie les observations selon les valeurs d'une colonne (ascendante ou descendante, avec l'opérateur `-`)                                                                                        |
-| setkey()        | setkey(crimes_dt, CATEGORIE)                                                 | Permet d'accélérer les opérations de recherche. Au lieu de trier les lignes de manière linéaire, R procède par [recherche dichotomique](https://fr.wikipedia.org/wiki/Recherche_dichotomique). |
+| Fonction | Usage | Explication |
+|-----------------|----------------------------------|-----------------------------------------|
+| `setDT()` | `setDT(crimes_df)` | Transforme le tableau de données de base en `data.table` |
+| `setnames()` | `setnames(crimes_dt, old=c("CATEGORIE", "DATE"), new=c("categorie", "date")` | Modifie les noms de colonnes |
+| `setcolorder()` | `setcolorder(crimes_dt, neworder = c("DATE", "CATEGORIE")` | Modifie l'ordre de présentation des colonnes. |
+| `setorder()` | `setorder(crimes_dt, -DATE)` | Trie les observations selon les valeurs d'une colonne (ascendante ou descendante, avec l'opérateur `-`) |
+| setkey() | `setkey(crimes_dt, CATEGORIE)` | Permet d'accélérer les opérations de recherche. Au lieu de trier les lignes de manière linéaire, R procède par [recherche dichotomique](https://fr.wikipedia.org/wiki/Recherche_dichotomique). |
 
 ## Défi
 
@@ -242,7 +279,22 @@ Une série de fonctions de `data.table` permettent de transformer la structure d
 
 ## **Aller plus loin avec `data.table`**
 
-L'extension `data table` possède plusieurs autres fonctions, symboles et opérateurs qu'on découvrira à l'usage. Pour aller plus loin en en apprendre davantage, on pourra consulter [la page de référence de l'extension]('https://rdatatable.gitlab.io/data.table/') et les présentations qui y sont répertoriées, dont celle de [Grant McDermott]('https://raw.githack.com/uo-ec510-2020-spring/lectures/master/05-datatable/05-datatable.html#').
+L'extension `data table` possède plusieurs autres fonctions, symboles et opérateurs qu'on découvrira à l'usage. Pour aller plus loin en en apprendre davantage, on pourra consulter les vignettes produites par les auteurs, Tyson Barrett *et al.*
+
+
+[Introduction to data.table (r-project.org)](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html)
+
+[Benchmarking data.table (r-project.org)](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-benchmarking.html)
+
+[Importing data.table (r-project.org)](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-importing.html)
+
+[Keys and fast binary search based subset (r-project.org)](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-keys-fast-subset.html)
+
+[Reference semantics (r-project.org)](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reference-semantics.html)
+
+[Efficient reshaping using data.tables (r-project.org)](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reshape.html)
+
+[Using .SD for Data Analysis (r-project.org)](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-sd-usage.html)
 
 Voir également:
 
