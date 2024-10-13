@@ -233,7 +233,7 @@ motif_romance <- "(?i)\\bamour\\b|\\blove\\b|\\bromance\\b"
 ```
 
 ### Remplacement de mots
-Utilisez `str_replace_all()` pour remplacer tous les titres de films dans lesquels on trouve le mot "cinéma" ou "film" par le mot "œuvre". Affiche ensuite les titres modifiés.
+Utilisez `str_replace_all()` pour remplacer tous les titres de films dans lesquels on trouve le mot "cinéma" ou "film" par le mot "œuvre". Affichez ensuite les titres modifiés.
 
 ```{r}
 motif_film <- "(?i)\\bcinéma\\b|\\bfilm\\b"
