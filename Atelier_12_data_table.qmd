@@ -28,10 +28,6 @@ extensions_v <- c("rbenchmark",
 
 lapply(extensions_v, inst_pack_f)
 
-library(rbenchmark)
-library(data.table)
-library(pryr)
-library(ggplot2)
 
 # Si vous souhaitez comparer la vitesse d'exécution des deux fonctions, supprimez les croisillons, exécutez les instructions et soyez patients: Les fonctions seront exécutées 100 fois chacune, puis les temps d'exécution seront renvoyées.
 
