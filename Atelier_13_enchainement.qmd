@@ -5,7 +5,7 @@ format: pdf
 editor: visual
 ---
 
-[![Crédit photographique: Alexander Jauk, Pixaday](images/pipeline-g21036ba54_1280.jpg){fig-align="center"}](Image par <a href="https://pixabay.com/fr/users/alex_jauk-16800354/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=5351017">Alexander Jauk</a> de <a href="https://pixabay.com/fr//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=5351017">Pixabay</a>)
+[![Crédit photographique: Alexander Jauk, Pixaday](images/pipeline-g21036ba54_1280.jpg){fig-align="center"}](Image%20par%20%3Ca%20href=%22https://pixabay.com/fr/users/alex_jauk-16800354/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=5351017%22%3EAlexander%20Jauk%3C/a%3E%20de%20%3Ca%20href=%22https://pixabay.com/fr//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=5351017%22%3EPixabay%3C/a%3E)
 
 ## L'enchainement des opérations grâce à `magrittr`
 
@@ -35,7 +35,7 @@ longMetrages$GENRE %>% unique() %>% head() %>% data.frame()
 
 ## L'enchainement des opérations dans R natif
 
-Jusqu'à récemment, l'usage du pipe était propre à `magrittr` et aux extensions construites sur ses fondements, notamment la famille d'extensions `tidyverse`. Dans la [version 4.1.0 de R](https://www.r-bloggers.com/2021/05/the-new-r-pipe/), parue en 2021, les développeurs ont introduit un équivalent du pipe `%>%`, soit `|>`. Il n'est donc plus nécessaire d'installer et d'activer `magrittr` pour pouvoir écrire vos instructions selon la philosophie introduite par cette extension. Ainsi, l'opération faite ci-dessus peut être menée avec le nouveau pipe:
+Jusqu'à récemment, l'usage du pipe était propre à `magrittr` et aux extensions construites sur ses fondements, notamment la famille d'extensions `tidyverse`. Dans la [version 4.1.0 de R](https://www.r-bloggers.com/2021/05/the-new-r-pipe/), parue en 2021, les développeurs ont introduit un équivalent du pipe `%>%`, soit `|>`. Il n'est donc plus nécessaire d'installer et d'activer `magrittr` pour pouvoir écrire vos instructions selon la philosophie introduite par cette extension. Ainsi, l'opération faite ci-dessus peut être menée avec le nouveau pipe en R natif de la manière suivante:
 
 ```{r}
 longMetrages$GENRE |> unique() |> head() |> data.frame()
@@ -43,7 +43,7 @@ longMetrages$GENRE |> unique() |> head() |> data.frame()
 
 ## L'enchaînement des opérations dans `data.table`
 
-Les tables de données créées avec data.table, on s'en rappelle, sont aussi des tableaux de données de type data.frame. Aussi, toute table de type data.table peut être utilisée avec les pipes provenant de magrittr ou de R 4.1.0+. Dans l'instruction ci-dessous, nous allons créer une nouvelle variable VERDICT fondée sur les modalités de COTE_MEDIAFILM, puis nous allons filtrer la table pour qu'elle ne retienne que les observations correspondant à la modalité "bon" que nous avons introduite.
+Les tables de données créées avec `data.table`, on s'en rappelle, sont aussi des tableaux de données de type `data.frame`. Aussi, toute table de type `data.table` peut être utilisée avec les pipes magrittr `%>%` et natif `|>` . Dans l'instruction ci-dessous, nous allons créer une nouvelle variable `VERDICT` fondée sur les modalités de `COTE_MEDIAFILM`, puis nous allons filtrer la table pour qu'elle ne retienne que les observations correspondant à la modalité "bon" que nous avons introduite.
 
 ```{r}
 if(!"data.table" %in% rownames(installed.packages())) {install.packages("data.table")}
@@ -52,19 +52,19 @@ library(data.table)
 setDT(longMetrages)
 class(longMetrages)
 
+# La nouvelle colonne, VERDICT, est fondée sur une COTE_MEDIAFILM supérieure à 3/5
 longMetrages[, VERDICT := ifelse(COTE_MEDIAFILM > 3, "bon", "mauvais")] %>% .[VERDICT == "bon"]
 ```
 
-On peut cependant faire les choses de manière plus élégante en recourant aux outils que fournit d'emblée `data.table`. Le pipe n'est tout simplement pas nécessaire, non plus que l'opérateur `.`, qui représente l'extrant de l'opération antérieure. On peut se contenter d'utiliser les opérateurs d'indexation `[ ]`:
+On peut cependant faire les choses de manière plus élégante en recourant aux outils que fournit d'emblée `data.table`. Le pipe n'est tout simplement pas nécessaire, non plus que l'opérateur `.`, qui représente l'extrant de l'opération antérieure. On peut se contenter d'utiliser les opérateurs d'indexation `[ ]` les uns à la suite des autres:
 
 ```{r}
 
-longMetrages[, VERDICT := ifelse(COTE_MEDIAFILM > 3, "bon", "mauvais")
-             ][VERDICT == "bon"]
+longMetrages[, VERDICT := ifelse(COTE_MEDIAFILM > 3, "bon", "mauvais")][VERDICT == "bon"]
 
 ```
 
-Dans l'opération ci-dessus, aucune copie profonde de l'objet n'a été faite. La colonne VERDICT a été faite par [sémantique référentielle](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reference-semantics.html) et l'extrant de cette opération a été fourni en intrant pour l'opération de filtrage sans créer de nouvelle copie de l'objet.
+Dans l'opération ci-dessus, aucune copie profonde de l'objet n'a été faite. La colonne VERDICT a été faite par [sémantique référentielle](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reference-semantics.html) et l'extrant de cette opération a été fourni en intrant pour l'opération de filtrage sans créer de nouvelle copie des données.
 
 Ce type de syntaxe est donc non seulement plus aisée à suivre et à lire, mais elle offre des gains computationnels importants.
 
