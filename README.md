@@ -11,4 +11,4 @@ Une fois `project.Rproj` activé, on pourra ouvrir les fichiers d'ateliers et ex
 Les fichiers sont sous licence MIT. La source des données est indiquée dans les scripts.
 
 ## Pour citer les ateliers
-Pascal Brissette (2023). "Ateliers d'initiation à R pour étudiants en SHS", Github <https://github.com/pbriss7/Atelier_initiation_R/tree/main>.
+Pascal Brissette (2023). "Ateliers d'initiation à R pour étudiants en SHS", Github <https://github.com/pbriss7/Atelier_initiation_R_pour_etudiants_en_SHS>.
