@@ -8,9 +8,28 @@ editor: visual
 
 [![Image vectorielle libre de droits, Pixabay](images/gear-wheel-g4c97afd80_1280.png){fig-align="center"}](https://pixabay.com/fr/vectors/roue-dent%c3%a9e-%c3%a9quipement-rouages-dent-310906/)
 
-On a dit déjà que les fonctions étaient dans R des objets qui, comme d'autres, pouvaient être créés de toutes pièces et modifiés. Les fonctions que vous avez utilisées jusqu'ici proviennent d'extensions conçues et construites par des programmeur·e·s avancé·e·s, mais rien ne vous empêche de créer vos propres fonctions, destinées à remplir des tâches spécifiques. Vous y êtes même fortement encouragé·e·s. Pourquoi?
+```{r}
+#| echo: FALSE
+inst_pack_f <- function(x) {
+  if(!x %in% rownames(installed.packages())) {
+    install.packages(x)
+    }
+  require(x, character.only = TRUE)
+}
 
-Tout d'abord, parce qu'une fonction est réutilisable et peut donc être mobilisée n'importe quand, dans n'importe quel script, pour effectuer une tâche donnée. Il y a donc un gain de temps: vous n'avez pas à vous répéter. Ensuite, si vous devez constamment recycler des lignes de codes ici et là comme autant de pièces d'un puzzle pour effectuer une opération, le fait d'assembler ces pièces en une fonction nommée permettra d'éviter les erreurs, les oublis, les pertes. Ajoutons qu'une fonction rend votre code plus facile à lire et, au besoin, plus simple à corriger. La fonction se présente comme un bloc d'instructions qu'on peut ouvrir pour en modifier les composantes, mais qui, enchâssées dans un objet de l'environnement, ne prend plus de place dans vos scripts. La structure d'une fonction est assez simple. Elle est créée avec la fonction `function()` et se présente ainsi:
+extensions_v <- c("stringr",
+                  "tm"
+                  )
+
+lapply(extensions_v, inst_pack_f)
+
+```
+
+Dans R, les fonctions sont des objets qui, comme n'importe quel objet (vecteur, liste, tableau de données, etc.), peuvent être créés de toutes pièces et modifiés. Les fonctions que vous avez utilisées jusqu'ici proviennent principalement de R natif ou d'extensions, mais rien ne vous empêche de créer vos propres fonctions, destinées à remplir des tâches spécifiques. Vous y êtes même fortement encouragé·e·s. Pourquoi?
+
+Tout d'abord, parce qu'une fonction est réutilisable et peut donc être mobilisée n'importe quand, dans n'importe quel script ou programme, pour effectuer une tâche donnée. Il y a donc un gain de temps: vous n'avez pas à vous répéter. Ensuite, si vous devez constamment recycler des lignes de codes ici et là comme autant de pièces d'un puzzle pour effectuer une opération, le fait d'assembler ces pièces en une fonction nommée permettra d'éviter les erreurs, les oublis, les pertes. Ajoutons qu'une fonction rend votre code plus facile à lire et, au besoin, plus simple à corriger.
+
+La fonction se présente comme un bloc d'instructions qu'on peut ouvrir pour en modifier les composantes. La structure d'un tel objet est assez simple. Il est créé avec `function()` et se présente ainsi:
 
 > `<nom_de_la_fonction> <- function(<arguments_facultatifs>) {`
 >
@@ -18,186 +37,235 @@ Tout d'abord, parce qu'une fonction est réutilisable et peut donc être mobilis
 >
 > `}`
 
-Il n'est pas obligatoire d'insérer des arguments dans la parenthèse de la fonction. S'il n'y en a pas, c'est que vous aurez fourni dans les instructions tout ce dont la fonction a besoin pour être exécutée. Les arguments peuvent également être définis par défaut et leurs valeurs pourront être modifiées lors de son utilisation, si nécessaire. Construisons une première fonction très simple qui permettra d'imiter le lancer d'un dés à 6 faces. On peut utiliser la fonction `sample.int()` pour créer une telle fonction:
+Lorsqu'on crée une fonction, il n'est pas obligatoire d'insérer des arguments dans la parenthèse de la fonction. S'il n'y en a pas, c'est que vous aurez fourni dans les instructions tout ce dont la fonction a besoin pour être exécutée, même les données. Cependant, une fonction qui intègre les données n'est pas réutilisable avec d'autres données. Idéalement, une fonction atteint un niveau minimal d'abstraction qui permet de l'utiliser avec différents jeux de données.
+
+Prenons un exemple concret.
+
+Une tâche que vous aurez souvent à réaliser dans vos analyses textuelles est le prétraitement. Cette tâche implique plusieurs décisions. Souhaite-t-on imposer le bas de casse? Veut-on supprimer les nombres, les symboles, les mots fonctionnels?
+
+Une fonction de prétraitement qui ne prendrait en entrée aucun argument pourrait ressembler à ceci:
 
 ```{r}
-lancer_du_de <- function() {
-  sample.int(n=6, size=1, replace = TRUE)
+
+pretraitement_f <- function() {
+  
+  # Vérification que l'extension 'tm' est bien disponible
+  if (!requireNamespace("tm", quietly = TRUE)) {
+    stop("L'extension 'tm' est requis pour cette fonction.")
+  }
+  
+  # Importation du jeu de données
+  maria_v <- readLines("donnees/maria_sans_epitexte.txt")
+  
+  # Conversion en minuscules
+  maria_v <- tolower(maria_v)
+  
+  # Segmentation du texte en unités lexicales (tokens)
+  maria_v <- strsplit(maria_v, "\\W") |> unlist()
+  
+  # Suppression des nombres
+  maria_v <- gsub(pattern = "[[:digit:]]+", replacement = " ", maria_v, perl = TRUE)
+  
+  # Suppression de la ponctuation
+  maria_v <- gsub(pattern = "[[:punct:]]+", replacement = " ", maria_v, perl = TRUE)
+  
+  # Suppression des mots fonctionnels
+  maria_v <- maria_v[!maria_v %in% tm::stopwords(kind ="fr")]
+  
+  # Élimination des éléments sans contenu, s'il y en a
+  maria_v <- maria_v[!maria_v == ""]
+  
+  # Renvoi du résultat
+  return(maria_v)
 }
 
-lancer_du_de()
+# Exécution de la fonction et transfert du résultat dans maria_pretraite_v
+maria_pretraite_v <- pretraitement_f()
+
+# observation du résultat
+maria_pretraite_v[1:100]
 ```
 
-\
-Cette fonction n'a pas besoin d'argument, elle contient tout ce dont elle a besoin. Vous l'exécutez autant de fois que vous le souhaitez et vous aurez toujours un nombre compris entre 1 et 6. Supposons maintenant que vous souhaitiez offrir à l'utilisateur de la fonction la possibilité de déterminer à l'avance combien de fois le dé devra être lancé automatiquement. Vous pourrez définir un argument par défaut de sorte que la fonction puisse fonctionner même si rien n'est indiqué dans la parenthèse, mais l'utilisateur pourra effectuer autant de "lancer de dés" qu'il voudra en modifiant la valeur de l'argument:
+Une telle fonction remplit peut-être sa mission ici, mais elle n'est pas suffisamment abstraite pour pouvoir être réutilisée ailleurs, avec d'autres données. De plus, elle n'offre aucun choix à l'utilisateur et ne tient donc pas compte des différentes décisions que ce dernier doit prendre en fonction de sa question de recherche.
+
+## Vers une fonction générique et réutilisable
+
+Pour améliorer notre fonction, nous allons commencer par "sortir" les données du corps de l'objet et faire en sorte que celui-ci puisse prendre en entrée des jeux de données variables.
+
+```{r}
+pretraitement_f <- function(donnees) {
+  
+  # Vérification que l'extension 'tm' est bien disponible
+  if (!requireNamespace("tm", quietly = TRUE)) {
+    stop("L'extension 'tm' est requis pour cette fonction.")
+  }
+  
+  # Conversion en minuscules
+  donnees <- tolower(donnees)
+  
+  # Segmentation du texte en unités lexicales (tokens)
+  donnees <- strsplit(donnees, "\\W") |> unlist()
+  
+  # Suppression des nombres
+  donnees <- gsub(pattern = "[[:digit:]]+", replacement = " ", donnees, perl = TRUE)
+  
+  # Suppression de la ponctuation
+  donnees <- gsub(pattern = "[[:punct:]]+", replacement = " ", donnees, perl = TRUE)
+  
+  # Suppression des mots fonctionnels
+  donnees <- donnees[!donnees %in% tm::stopwords(kind ="fr")]
+  
+  # Élimination des éléments sans contenu, s'il y en a
+  donnees <- donnees[!donnees == ""]
+  
+  # Renvoi du résultat
+  return(donnees)
+}
+
+# Puisque les données ne sont plus contenues dans la fonction, il faut d'abord les charger en mémoire.
+
+maria_v <- readLines("donnees/maria_sans_epitexte.txt")
+
+# On passe ensuite ce vecteur texte à la fonction.
+maria_pretraite_v <- pretraitement_f(donnees = maria_v)
+
+maria_pretraite_v[1:100]
+
+```
+
+Ainsi construite, notre fonction pourra prendre n'importe quelle autre chaîne de caractères en entrée. La preuve:
+
+```{r}
+pretraitement_f(donnees = "C'était un grand vaisseau taillé dans l'or massif. Ses mats touchaient l'azur, sur des mers inconnues.")
+
+
+```
+
+## Adapter la fonction aux besoins de l'utilisateur
+
+Pour améliorer encore notre fonction, nous pouvons y ajouter des arguments qui permettront à l'utilisateur de produire un résultat conforme à ses besoins. Dans ses précédentes version, la fonction segmente le texte, impose les minuscules, supprime les ponctuations et les symboles, ainsi que les mots fonctionnels. L'utilisateur, à moins d'entrer dans le corps de la fonction et de la modifier de l'intérieur, ne peut choisir ses options de prétraitement.
+
+Nous pouvons changer cela en ajouter à la fonction des arguments dans la parenthèse de `function()`. On indiquera des options par défaut à ces arguments, mais l'utilisateur pourra modifier ces paramètres lors de l'utilisation.
+
+```{r}
+pretraitement_f <- function(donnees, minuscules=TRUE, enlever_nombres=TRUE, enlever_ponctuation=TRUE, enlever_mots_fonctionnels=TRUE) {
+  
+  # Vérification que l'extension 'tm' est bien disponible
+  if (!requireNamespace("tm", quietly = TRUE)) {
+    stop("L'extension 'tm' est requis pour cette fonction.")
+  }
+
+  # Conversion en minuscules si demandé
+  if (minuscules) {
+    donnees <- tolower(donnees)
+  }
+  
+  # Suppression de la ponctuation si demandé
+  if (enlever_ponctuation) {
+    donnees <- gsub(pattern = "[[:punct:]]+", replacement = " ", donnees, perl = TRUE)
+  } 
+  
+  # Suppression des nombres si demandé
+  if (enlever_nombres) {
+    donnees <- gsub(pattern = "[0-9]+", replacement = " ", donnees, perl = TRUE)
+  } 
+
+  # Segmentation du texte en unités lexicales
+  donnees <- strsplit(donnees, "\\s+") |> unlist()
+
+  # Suppression des mots fonctionnels si demandé
+  if (enlever_mots_fonctionnels) {
+    donnees <- donnees[!donnees %in% tm::stopwords(kind ="fr")]
+  } 
+
+  # Avertissement si aucun mot n'est retenu après le prétraitement
+  if (length(donnees) == 0) {
+    warning("Le texte traité ne contient plus aucun mot après le prétraitement.")
+  }
+
+  return(donnees)
+}
+
+pretraitement_f(
+  donnees = texte,
+  minuscules = TRUE,
+  enlever_ponctuation = TRUE,
+  enlever_nombres = TRUE,
+  enlever_mots_fonctionnels = TRUE)
+```
+
+## Fonction nommée VS fonction anonyme
+
+La fonction de prétraitement ci-dessus porte un nom, `pretraitement_f()`. On peut aussi créer des fonctions anonymes, généralement moins complexes, qui ne sont pas destinées à être réutilisée hors d'un contexte donné.
+
+Pour illustrer l'intérêt de ces fonctions anonymes, créons d'abord une fonction appelée `lancer_du_de_f`. Celle-ci, lorsqu'elle est exécutée, permet d'obtenir un nombre aléatoire compris entre 1 et 6. Le seul argument de la fonction est `nbre_fois=`, qui permet à l'utilisateur de préciser combien de lancers il souhaite faire. Par défaut, cet argument est de 1.
+
+```{r}
+lancer_du_de_f <- function(nbre_fois = 1) {
+  
+  # Création d'un vecteur contenant autant de NA que demandé dans nbre_fois=
+  mes_lancers_v <- rep(NA, nbre_fois)
+  
+  # Boucle qui "lancera le dé" autant de fois que demandé, et placera le résultat dans le vecteur mes_lancers_v
+  for(i in seq_along(mes_lancers_v)) {
+    mes_lancers_v[i] <- sample.int(n=6, size = 1, replace = TRUE)
+  }
+  
+  # Renvoi du résultat
+  return(mes_lancers_v)
+}
+
+lancer_du_de_f()
+```
+
+Au lieu d'une boucle `for()`, on aurait pu, avec avantage, utiliser une fonction `sapply()` qui comprend elle-même trois arguments:
+
+1\) un argument `X=`, l'objet sur lequel se fait l'itération;
+
+2\) une fonction qui sera appliquée sur chaque élément de `X=`;
+
+3\) les arguments éventuels de cette même fonction, séparés les uns des autres par une virgule.
+
+C'est ici qu'une fonction anonyme peut être utile. Nous allons réécrire la fonction précédente en utilisant `sapply()` et en créant une fonction anonyme:
 
 ```{r}
 
-lancer_du_de <- function(nbre_fois = 1) {
-  mes_lancers <- rep(NA, nbre_fois)
-  for(i in seq_along(mes_lancers)) {
-    mes_lancers[i] <- sample.int(n=6, size = 1, replace = TRUE)
-  }
-  return(mes_lancers)
+lancer_du_de_f<- function(nbre_fois=1){
+  
+  sapply(X=1:nbre_fois, 
+         FUN = function(x) sample.int(n=6, size = 1, replace = TRUE))
 }
 
 # Essayez
-lancer_du_de()
-lancer_du_de(nbre_fois = 25)
+lancer_du_de_f()
+lancer_du_de_f(25)
 
-```
-
-Dans la fonction `lancer_du_de()` ci-dessus, on définit une valeur par défaut pour l'argument `nbre_de_fois=`, 1. Si on ne modifie pas cette valeur avant d'exécuter la fonction, celle-ci sera utilisée dans les instructions. Que comprennent ces instructions?
-
-| Instruction de la fonction `lancer_du_de()`                   | Explication                                                                                                                                                                                                                                                                                             |
-|---------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `lancer_du_de <- function(nbre_fois = 1)`                     | Assignation d'un nom à la fonction et définition de son argument par défaut.                                                                                                                                                                                                                            |
-| `mes_lancers <- rep(NA, nbre_fois)`                           | Instruction 1: création d'un vecteur composé de valeurs nulles (`NA`) dont la longeur correspond à l'argument de la fonction.                                                                                                                                                                           |
-| `for(i in seq_along(mes_lancers))`                            | Instruction 2: création d'une boucle `for()` - le nombre d'itération sera équivalent au nombre d'éléments du vecteur créé à l'instruction 1.                                                                                                                                                            |
-| `mes_lancers[i] <- sample.int(n=6, size = 1, replace = TRUE)` | Instruction de la boucle `for()` : à chaque itération, `sample.int()` génère un nombre aléatoire compris entre 1 et 6. C'est le lancé du dé à proprement parler. Le résultat de chaque lancer est emmagasiné dans l'une des cases du vecteur `mes_lancers`. Cette valeur prend donc la place d'un `NA`. |
-| `return(mes_lancers)`                                         | Instruction 3: on demande à la fonction de renvoyer le vecteur `mes_lancers`, composé des "coups de dés".                                                                                                                                                                                               |
-
-## Une fonction plus utile
-
-Trève d'amusement, il est maintenant temps de construire une fonction qui nous servira plus souvent dans le cadre du cours. Une tâche que vous devez répéter chaque fois que vous commencez à travailler est l'importation et l'installation des extensions dont vous avez besoin dans le cadre de votre travail. On pourrait construire une fonction qui nous demande quelles extensions sont à installer et qui, ensuite, avec la série de noms d'extensions que nous lui avons fournie, vérifie si elles sont déjà installées et, dans le cas contraire, fait cette action.
-
-Nous pouvons décomposer notre tâche en deux parties. Dans un premier temps, nous allons créer la fonction principale. Une fois que nous aurons construit et testé cette fonction, nous pourrons l'intégrer à une nouvelle fonction qui s'occupera de récolter la liste des extensions que nous souhaitons installer.
-
-#### Première partie
-
-Nous allons donc définir une fonction appelée `installer_extension()` qui contiendra une instruction avec laquelle vous êtes désormais familier·ère :
-
-```{r}
-installer_extension <- function(x="stringr") {
-  if(!x %in% rownames(installed.packages())) {install.packages(x)}
-}
-
-# Essayez! Insérer un nom d'extension comme argument
-installer_extension(x="data.table")
-```
-
-L'argument par défaut est composé d'un nom d'extension que vous connaissez maintenant bien, si vous avez fait l'Atelier 11. L'instruction comprend une structure de contrôle `if()` qui dit à R qu'il doit installer l'extension définie comme argument si son nom ne se trouve pas parmi les noms de fonctions installées.
-
-Pour tester cette fonction, vous pouvez désinstaller une extension puis donner ensuite son nom à notre fonction maison. Observez le résultat.
-
-```{r}
-# Désinstaller une extension
-remove.packages("data.table")
-
-# Réinstaller cette fonction avec notre fonction maison
-installer_extension("data.table")
-```
-
-#### Deuxième partie
-
-Notre fonction fait bien le travail pour laquelle nous l'avons créée, mais on ne peut lui passer qu'un seul élément à la fois et on doit l'exécuter manuellement autant de fois que nous lui passons d'éléments. Nous pouvons faire mieux!
-
-Créons d'abord un vecteur comprenant quelques noms d'extension que nous aimerions installer. Ensuite, passons ce vecteur à une boucle `for()` en réutilisant la fonction que nous avons créée ci-dessus. Nous allons également ajouter à cette boucle la fonction d'activation `library()`, pour que toutes les extensions qu'on veut utiliser soit disponibles:
-
-```{r}
-mes_extensions <- c("data.table", "proustr", "stringr", "rbenchmark", "lsa")
-
-# Désinstaller les extensions
-sapply(mes_extensions, remove.packages)
-
-# Boucle qui installe et active chaque extension indiquée dans le vecteur mes_extensions
-for(i in seq_along(mes_extensions)){
-  installer_extension(x = mes_extensions[i])
-  library(mes_extensions[i], character.only = TRUE)
-}
-
-```
-
-À chaque itération de la boucle, la fonction `installer_extension()` prend un élément du vecteur comme argument et installe l'extension si ce n'est déjà fait. Une autre instruction de la boucle active cette extension.
-
-On voudrait maintenant ne pas avoir à créer le vecteur d'extensions manuellement et ne pas avoir à écrire la boucle pour que le processus d'installation/activation soit déclenché. Pour arriver à ce résultat, nous devrons :
-
-1.  Utiliser `readline()` pour indiquer à R qu'il doit nous demander quelles extensions nous souhaitons installer/activer, et assigner le résultat à un vecteur;
-2.  À l'aide de la fonction de base `strsplit()`, séparer les noms d'extensions que nous aurons fournis à R pour qu'ils forment des éléments séparés;
-3.  Transformer la liste produite par `strsplit()` en un vecteur avec `unlist()`;
-4.  Créer une boucle qui prendra ce vecteur et qui passera ses éléments, un à un, à notre fonction maison.
-
-Ces différentes opérations seront intégrées comme lignes d'instructions à une fonction plus générale appelée `lancer_extensions()` (avec le "s" comme marque du pluriel)
-
-Le résultat pourrait ressembler à ceci:
-
-```{r}
-lancer_extensions <- function() {
-  
-  # On crée ici notre fonction maison, mais, cette fois, on ne donne aucun argument par défaut
-  installer_extension <- function() {
-  if(!x %in% rownames(installed.packages())) {install.packages(x)}
-    }
-  
-  # On demande à R de nous demander quelles extensions sont à installer
-  noms_extensions <- readline(prompt = "Quelles extensions activer? Sépare chaque nom d'extension par une virgule (ex.: data.table,dplyr,ggplot2). Réponse: ")
-  
-  # On segmente la réponse que nous avons fournie en prenant la virgule comme élément séparateur, puis on transforme la liste en vecteur
-  noms_extensions_l <- strsplit(noms_extensions, ",")
-  noms_extensions_v <- unlist(noms_extensions_l)
-
-  # Boucle qui prend chaque élément du vecteur ci-dessus, le passe à la fonction m la fonction d'activation library()
-  for(i in seq_along(noms_extensions_v)){
-    if(length(noms_extensions_v) > 0){
-      installer_extension(x = noms_extensions_v[i])
-      library(noms_extensions_v[i], character.only = TRUE)
-    }
-  }
-}
-
-```
-
-On n'a plus qu'à exécuter cette dernière fonction (idéalement dans la console) pour que R nous demande quelles fonctions sont à installer et à activer.
-
-```{r}
-
-lancer_extensions()
-
-```
-
-Si vous estimez cette fonction utile, vous pouvez la copier dans un simple fichier .R (exemple: mes_fonctions.R). Vous pourrez enregistrer ce fichier dans votre dossier de travail et appeler ce fichier et les fonctions qu'il contient, au début de vos propres scripts, avec la fonction `source()`, comme ceci:
-
-```{r}
-source("mes_fonctions.R")
-lancer_extensions()
-```
-
-## Fonction nommée VS fonction anonyme (pour étudiant·e avancé·e)
-
-Nous avons créé jusqu'ici deux fonctions nommées, `lancer_du_de()` et `lancer_extensions()`. On peut aussi créer des fonctions anonymes qui ne serviront qu'une fois, par exemple à l'intérieur d'une autre fonction qui prend comme argument une fonction et ses arguments.
-
-Reprenons notre fonction du lancé du dé. Elle est construite comme suit:
-
-```{r}
-lancer_du_de <- function(nbre_fois = 1) {
-  mes_lancers <- rep(NA, nbre_fois)
-  for(i in seq_along(mes_lancers)) {
-    mes_lancers[i] <- sample.int(n=6, size = 1, replace = TRUE)
-  }
-  return(mes_lancers)
-}
-
-lancer_du_de(25)
-```
-
-Au lieu d'une boucle for(), on aurait pu, avec avantage, utiliser une fonction `sapply()` qui prend, rappelons-le, 1) un argument `X=`, l'objet sur lequel se fait l'itération; 2) une fonction qui prendra chaque élément défini par `X=`; 3) les arguments éventuels de cette même fonction, séparés les uns des autres par une virgule. C'est ici qu'une fonction anonyme peut être utile.
-
-```{r}
-# La même fonction peut être écrite plus simplement avec sapply()
-lancer_sapply <- function(nbre_fois=1){
-  sapply(X=1:nbre_fois, FUN = function(x) sample.int(n=6, size = 1, replace = TRUE))
-}
-
-# Essayez
-lancer_sapply()
-lancer_sapply(25)
 ```
 
 La fonction anonyme est créée au sein même de `sapply()` et ne pourra pas être réutilisée ailleurs. Elle ne remplit qu'une tâche, qui est d'indiquer à `sapply()` la fonction à utiliser sur les éléments du vecteur fourni en entrée. Cette fonction n'a pas de nom et n'a pas non plus besoin d'être encadrée par des accolades.
 
 ## Défi
 
-Créez une fonction appelée nettoyer_texte qui aura pour
+Dans les ateliers précédents, nous avons utilisé une fonction nommée qui servait à installer et à activer des extensions:
+
+```{r}
+inst_pack_f <- function(x) {
+  if(!x %in% rownames(installed.packages())) {
+    install.packages(x)
+    }
+  require(x, character.only = TRUE)
+}
+
+extensions_v <- c("rbenchmark",
+                  "data.table",
+                  "pryr",
+                  "ggplot2"
+                  )
+
+lapply(extensions_v, inst_pack_f)
+```
+
+Analysez cette fonction, `inst_pack_f`, et demandez-vous ce qu'impliquerait l'intégration des noms d'extension directement à l'intérieur de la parenthèse d'arguments de la fonction. Vous pouvez tenter de la modifier en conséquence!
 
 ## Pour aller plus loin
 
