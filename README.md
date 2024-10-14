@@ -8,7 +8,7 @@ Il est recommandé d'installer R et RStudio sur son ordinateur, puis d'activer l
 Une fois `project.Rproj` activé, on pourra ouvrir les fichiers d'ateliers et exécuter le code. Toutes les données et images requises pour le bon fonctionnement des ateliers se trouvent dans les dossiers respectifs.
 
 ## Licence d'utilisation
-Les fichiers sont sous licence MIT. La source des données est indiquée dans les scripts.
+Les fichiers sont sous licence MIT. Les données utilisées dans les ateliers proviennent de [Données Québec](https://www.donneesquebec.ca/) et du [Gutenberg Project](https://www.gutenberg.org/)
 
 ## Pour citer les ateliers
 Pascal Brissette (2023). "Ateliers d'initiation à R pour étudiants en SHS", Github <https://github.com/pbriss7/Atelier_initiation_R_pour_etudiants_en_SHS>.
